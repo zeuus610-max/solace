@@ -1,0 +1,1 @@
+Place a properly licensed labeled dataset here as `labeled_urls.csv` with columns `url,label` where 0=legitimate and 1=phishing. Do not commit private, credential-bearing, or otherwise sensitive URLs. The starter model is generated synthetically for end-to-end testing only.

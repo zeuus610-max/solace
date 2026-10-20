@@ -1,0 +1,9 @@
+.git
+.venv
+__pycache__
+*.py[cod]
+.DS_Store
+.env
+backend/phishguard.sqlite3
+backend/phishguard_model.joblib
+index.orbit-dashboard.backup.html
