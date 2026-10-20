@@ -1,8 +1,8 @@
 # PhishGuard — AI Handoff Note
 
 > **Last updated by:** Antigravity (Google Gemini)
-> **Timestamp:** 2026-10-20T08:46Z
-> **Git commit:** `b17acca` — "Initial commit: PhishGuard backend + frontend"
+> **Timestamp:** 2026-10-20T08:48Z
+> **Git commit:** `cc7184d` — "Add HANDOFF.md for cross-AI coordination"
 
 ---
 
@@ -53,6 +53,13 @@ PhishGuard is a single-page URL phishing-analysis demo with:
 3. **Created this `HANDOFF.md`** — for cross-AI coordination.
 
 No code changes were made to any source file. The project is in its original, working state.
+
+## Frontend Details
+
+- **Report form:** The "Report" nav item opens a form that submits URL, category, and notes to `POST /api/v1/reports`. Reports are stored in local SQLite; this is not a Jira or external-tracker integration.
+- **Header logo:** Static PNG at `assets/phishguard-logo.png`.
+- **Hero background:** A muted looping video. JavaScript attempts to start and resume it on page load and when the tab regains focus. Safari may block autoplay in Low Power Mode.
+- **Docker:** `Dockerfile.backend`, `Dockerfile.frontend`, and `compose.yaml` exist but have **not** been built or run in an environment with Docker installed.
 
 ## Current State / Known Issues
 
