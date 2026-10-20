@@ -1,0 +1,84 @@
+name: SOLACE CI/CD Pipeline
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test-and-lint:
+    name: Backend Validation & Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run code validation & syntax check
+        run: |
+          python -m py_compile backend/main.py
+
+      - name: Execute Backend Model & Heuristic Smoke Test
+        run: |
+          python -c "
+          from backend.main import extract_features, scan_url, ARTIFACT
+          assert 'model' in ARTIFACT, 'Model artifact missing'
+          test_res = scan_url('http://paypal-security-update.xyz/login')
+          assert test_res['verdict'] in ['PHISHING', 'SUSPICIOUS', 'SAFE']
+          assert len(test_res['featuresList']) == 14
+          print('✅ Core ML inference and 14-vector feature extraction verified successfully.')
+          "
+
+  docker-build:
+    name: Container Build & Verification
+    runs-on: ubuntu-latest
+    needs: test-and-lint
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Backend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.backend
+          push: false
+          tags: solace-backend:latest
+
+      - name: Build Frontend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.frontend
+          push: false
+          tags: solace-frontend:latest
+
+  k8s-manifest-check:
+    name: Kubernetes Manifest Validation
+    runs-on: ubuntu-latest
+    needs: test-and-lint
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Dry-run validate Kubernetes files
+        run: |
+          which kubectl > /dev/null 2>&1 || sudo snap install kubectl --classic
+          kubectl apply --dry-run=client -f k8s/

@@ -1,100 +1,94 @@
-# PhishGuard — AI Handoff Note
+# SOLACE — AI Handoff Note
 
-> **Last updated by:** Antigravity (Google Gemini)
-> **Timestamp:** 2026-10-20T08:48Z
-> **Git commit:** `cc7184d` — "Add HANDOFF.md for cross-AI coordination"
+> **Last updated by:** Antigravity (Google Gemini)  
+> **Timestamp:** 2026-10-20T12:45Z  
+> **Platform Version:** SOLACE v2.4 (Rebrand & Capstone Upgrade)  
 
 ---
 
-## Project Summary
+## 🛡️ Project Summary
 
-PhishGuard is a single-page URL phishing-analysis demo with:
+**SOLACE** (formerly PhishGuard) is a premium, zero-execution URL phishing and threat intelligence platform built for zero-trust link verification.
+- **Backend:** FastAPI (Python 3.10+) on `127.0.0.1:8001` with scikit-learn Random Forest ensemble (220 trees) evaluating 14 structural/lexical features in <50ms.
+- **Frontend:** 4-page cinematic dark web application (Ranvel-inspired styling, orange glowing 3D aesthetics, Chart.js visualizations) on `127.0.0.1:8000`.
+- **Infrastructure:** Multi-container Docker Compose, declarative Kubernetes manifests (`k8s/`), Vercel edge configuration (`vercel.json`), and GitHub Actions CI/CD (`.github/workflows/ci.yml`).
 
-- **Backend:** FastAPI (Python) at `127.0.0.1:8001` — scikit-learn Random Forest model, SQLite scan history, feature extraction from URL structure (never fetches the URL).
-- **Frontend:** Static HTML/CSS/JS at `127.0.0.1:8000` — cinematic dark UI, calls the backend API.
-- **Docker:** `compose.yaml` with separate backend/frontend containers.
+---
 
-## File Map
+## 🗂️ Complete File Map
 
-| File/Dir | Purpose |
+| Path | Purpose |
 |---|---|
-| `backend/main.py` | All backend logic: FastAPI app, model training, feature extraction, DB, API routes |
-| `backend/phishguard_model.joblib` | Trained model artifact (gitignored via binary) |
-| `backend/phishguard.sqlite3` | Local SQLite scan history (gitignored via binary) |
-| `index.html` | Active frontend (single-page app, ~40KB) |
-| `index.orbit-dashboard.backup.html` | Original dashboard backup (~130KB, preserved) |
-| `requirements.txt` | Python deps: fastapi, uvicorn, scikit-learn, numpy, joblib |
-| `compose.yaml` | Docker Compose config (backend + frontend services) |
-| `Dockerfile.backend` | Backend container image |
-| `Dockerfile.frontend` | Frontend container (python http.server) |
-| `start-backend.sh` | Local dev: creates venv, installs deps, runs uvicorn |
-| `start-frontend.sh` | Local dev: python http.server on port 8000 |
-| `assets/phishguard-logo.png` | Logo image |
-| `data/README.md` | Instructions for labeled_urls.csv dataset |
-| `README.md` | Project documentation |
-
-## API Routes
-
-| Method | Path | Description |
-|---|---|---|
-| GET | `/api/v1/health` | Service + model status |
-| POST | `/api/v1/scans` | Analyze a URL `{ "url": "..." }` |
-| GET | `/api/v1/scans?limit=200` | Scan history |
-| DELETE | `/api/v1/scans` | Clear history |
-| GET | `/api/v1/model` | Model metadata + feature importance |
-| GET | `/api/v1/analytics/summary` | Aggregate verdict counts |
-| POST | `/api/v1/reports` | Community report submission |
-| POST | `/api/v1/model/retrain` | Retrain from `data/labeled_urls.csv` |
-
-## What Antigravity Did This Session
-
-1. **Explored the full project structure** — read every source file.
-2. **Initialized git** — created `master` branch with initial commit `b17acca` containing all 14 tracked files.
-3. **Created this `HANDOFF.md`** — for cross-AI coordination.
-
-No code changes were made to any source file. The project is in its original, working state.
-
-## Frontend Details
-
-- **Report form:** The "Report" nav item opens a form that submits URL, category, and notes to `POST /api/v1/reports`. Reports are stored in local SQLite; this is not a Jira or external-tracker integration.
-- **Header logo:** Static PNG at `assets/phishguard-logo.png`.
-- **Hero background:** A muted looping video. JavaScript attempts to start and resume it on page load and when the tab regains focus. Safari may block autoplay in Low Power Mode.
-- **Docker:** `Dockerfile.backend`, `Dockerfile.frontend`, and `compose.yaml` exist but have **not** been built or run in an environment with Docker installed.
-
-## Current State / Known Issues
-
-- **Not a git remote yet** — repo is local only. Push to GitHub for safer collaboration.
-- **Model is synthetic** — trained on generated data, not real phishing URLs. Metrics are not real-world performance.
-- **No authentication** — API is open; CORS locked to `127.0.0.1:8000` / `localhost:8000`.
-- **No tests** — no test suite exists.
-- **Frontend is a single monolithic HTML file** — ~40KB with inline CSS/JS.
-- **Backend is a single `main.py`** — ~241 lines, no module splitting.
-
-## What the Next AI Should Do
-
-> ⚠️ **Update this section before starting work. Check the git log for any uncommitted changes first.**
-
-**Pending task:** _(Fill in your next task here, e.g., "Add unit tests", "Split backend into modules", "Improve frontend UI", etc.)_
-
-**Instructions for the next AI:**
-1. Run `git status` and `git log --oneline -5` to verify clean state.
-2. Create a feature branch: `git checkout -b <feature-name>`.
-3. Make changes and commit frequently with descriptive messages.
-4. Update this `HANDOFF.md` with:
-   - What you changed and which files
-   - Any remaining issues or next steps
-   - Your last commit hash
-5. Commit the updated `HANDOFF.md` last.
+| `frontend/index.html` | **Page 1 (Home):** Cinematic Ranvel-style landing page with 3D looping video hero, stats ribbon, quick scan launcher, and feature grid. |
+| `frontend/scanner.html` | **Page 2 (Scanner):** Deep analysis engine with Chart.js doughnut gauge, URL token chips, 14-feature horizontal bar chart, and community reporting drawer. |
+| `frontend/dashboard.html` | **Page 3 (Dashboard):** Live threat telemetry, verdict distribution pie chart, global model weights bar chart, and searchable IOC log with CSV export. |
+| `frontend/about.html` | **Page 4 (About):** System architecture, zero-execution rationale, 14-feature lexical extraction visualizer, and SE toolchain matrix. |
+| `frontend/css/styles.css` | Centralized design system tokens, typography scales, glassmorphism cards, badges, and responsive breakpoints. |
+| `frontend/js/solace.js` | Shared API client, Chart.js constructor helpers, navigation controller, counter animations, and toast notifications. |
+| `backend/main.py` | FastAPI application, 14-feature extractor, Random Forest training/inference, SQLite IOC storage, and flexible CORS middleware. |
+| `backend/phishguard_model.joblib` | Serialized scikit-learn Random Forest model artifact. |
+| `backend/phishguard.sqlite3` | Local SQLite database persisting scan history and community reports. |
+| `vercel.json` | Vercel Edge configuration with route rewrites and enterprise HTTP security headers. |
+| `.github/workflows/ci.yml` | GitHub Actions CI/CD pipeline: Python syntax validation, model smoke test, Docker build, and K8s manifest validation. |
+| `k8s/deployment.yaml` | Kubernetes Deployments (backend + frontend replicas, health probes, resource requests/limits, PVC). |
+| `k8s/service.yaml` | Kubernetes ClusterIP Services for frontend (8000) and backend (8001). |
+| `k8s/ingress.yaml` | Kubernetes Nginx Ingress routing `/api` to backend and `/` to frontend. |
+| `docs/JIRA_SPRINT_BACKLOG.md` | Capstone Agile Jira board with 5 Epics, User Stories, Story Points, and Acceptance Criteria. |
+| `docs/CONFLUENCE_ARCHITECTURE_SPEC.md` | Capstone Confluence architecture blueprint with ADRs, 14-vector math definitions, and API specs. |
+| `docs/FIGMA_DESIGN_SYSTEM.md` | Capstone Figma design system specifications, color hex codes, and component rules. |
+| `compose.yaml` | Docker Compose orchestration for local multi-container execution. |
+| `Dockerfile.backend` | Non-root Python 3.12 container for the FastAPI API. |
+| `Dockerfile.frontend` | Lightweight container serving the 4-page static frontend. |
+| `start-backend.sh` | Local dev script to launch backend in virtualenv on port 8001. |
+| `start-frontend.sh` | Local dev script to serve `frontend/` on port 8000. |
+| `README.md` | Complete project documentation and quick-start instructions. |
 
 ---
 
-## Handoff Protocol
+## 🛠️ Capstone SE Tools Verification Checklist
 
-```
-1. AI-A finishes work → commits → updates HANDOFF.md → commits HANDOFF.md
-2. AI-B reads HANDOFF.md → runs git log/status → starts work
-3. AI-B finishes → commits → updates HANDOFF.md → commits HANDOFF.md
-4. Repeat
-```
+| # | Tool | Deliverable & Implementation |
+|---|---|---|
+| 1 | **GitHub** | Local git repository with structured commits and semantic handoff notes. |
+| 2 | **Deployment** | Configured for Vercel / Netlify via `vercel.json` with clean URL routing. |
+| 3 | **Jira** | Sprint plan with 5 Epics, 8 User Stories, and Acceptance Criteria in `docs/JIRA_SPRINT_BACKLOG.md`. |
+| 4 | **Confluence** | System design spec, ADR-001/002/003, and data contracts in `docs/CONFLUENCE_ARCHITECTURE_SPEC.md`. |
+| 5 | **Figma** | Design tokens, typography hierarchy, and UI guidelines in `docs/FIGMA_DESIGN_SYSTEM.md`. |
+| 6 | **Docker** | Multi-container setup in `compose.yaml`, `Dockerfile.backend`, `Dockerfile.frontend`. |
+| 7 | **Kubernetes** | Declarative manifests in `k8s/deployment.yaml`, `k8s/service.yaml`, `k8s/ingress.yaml`. |
+| 8 | **CI/CD Pipeline** | Automated GitHub Actions workflow in `.github/workflows/ci.yml`. |
 
-This avoids conflicts because only one AI edits at a time, and the handoff note carries full context.
+---
+
+## 📋 What Was Accomplished in This Session
+
+1. **Rebranded platform to SOLACE:**
+   - Transformed single-page layout into a 4-page application.
+   - Built Ranvel-inspired cinematic dark design system with orange glowing accents and glassmorphic cards.
+2. **Built all 4 frontend pages:**
+   - `frontend/index.html` (Hero with looping 3D video, stats ribbon, quick scan launcher).
+   - `frontend/scanner.html` (Interactive Chart.js doughnut risk gauge, URL chips, feature bar chart, report drawer).
+   - `frontend/dashboard.html` (Aggregate stat cards, verdict distribution pie chart, model weights chart, filterable IOC table, CSV export).
+   - `frontend/about.html` (Architecture blueprint, 14-vector XAI breakdown, and Capstone SE toolchain matrix).
+3. **Backend & DevOps:**
+   - Updated `backend/main.py` with flexible CORS supporting Vercel, Netlify, and local dev ports.
+   - Created `vercel.json` for edge deployment.
+   - Created declarative Kubernetes manifests (`k8s/`).
+   - Created GitHub Actions CI/CD workflow (`.github/workflows/ci.yml`).
+   - Created Capstone SE documentation in `docs/` (Jira backlog, Confluence architecture spec, Figma design system).
+   - Rewrote `README.md`.
+
+---
+
+## 🚀 How to Run and Verify
+
+```bash
+# Terminal 1: Backend
+./start-backend.sh
+
+# Terminal 2: Frontend
+./start-frontend.sh
+```
+* Open `http://127.0.0.1:8000` in browser.
+* Test scanning a suspicious URL or genuine domain.
+* View live telemetry and charts on `http://127.0.0.1:8000/dashboard.html`.

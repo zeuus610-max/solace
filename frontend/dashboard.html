@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Threat Telemetry & Analytics — SOLACE</title>
+  <link rel="icon" type="image/png" href="assets/solace-logo.png">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="nav" id="topNav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="SOLACE Home">
+        <img src="assets/solace-logo.png" alt="SOLACE Logo" class="nav__logo">
+        <span class="nav__wordmark">SOLACE</span>
+      </a>
+
+      <nav class="nav__links" id="navLinks">
+        <a href="index.html" class="nav__link">Home</a>
+        <a href="scanner.html" class="nav__link">Scanner</a>
+        <a href="dashboard.html" class="nav__link nav__link--active">Dashboard</a>
+        <a href="about.html" class="nav__link">About</a>
+      </nav>
+
+      <div class="nav__cta">
+        <a href="scanner.html" class="btn btn--primary btn--sm">
+          <span>New Scan</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+        </a>
+      </div>
+
+      <button class="nav__toggle" id="navToggle" aria-label="Toggle Navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Dashboard Main Container -->
+  <main class="section" style="padding-top: 130px; min-height: 85vh;">
+    <div class="container">
+
+      <!-- Header & Quick Controls -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <div class="section__eyebrow">Real-Time Threat Telemetry</div>
+          <h1 class="text-h1 section__title">Threat Stream & Analytics</h1>
+          <p class="section__subtitle">
+            Live corpus intelligence, model inference statistics, and historical URL indicators.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button type="button" class="btn btn--secondary btn--sm" onclick="fetchDashboardData()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            <span>Refresh</span>
+          </button>
+          <button type="button" class="btn btn--ghost btn--sm" style="color: var(--danger);" onclick="confirmClearHistory()">
+            <span>Clear History</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Top Row: Aggregate Stat Cards -->
+      <div class="grid grid--4" style="margin-bottom: 32px;">
+        <div class="card stat fade-in">
+          <div class="stat__value stat__value--accent" id="statTotalScans">0</div>
+          <div class="stat__label">Total URLs Evaluated</div>
+        </div>
+
+        <div class="card stat fade-in">
+          <div class="stat__value stat__value--danger" id="statPhishing">0</div>
+          <div class="stat__label">Malicious Phishing Detected</div>
+        </div>
+
+        <div class="card stat fade-in">
+          <div class="stat__value stat__value--warning" id="statSuspicious">0</div>
+          <div class="stat__label">Elevated Suspicious Alerts</div>
+        </div>
+
+        <div class="card stat fade-in">
+          <div class="stat__value stat__value--safe" id="statSafe">0</div>
+          <div class="stat__label">Verified Safe Destinations</div>
+        </div>
+      </div>
+
+      <!-- Middle Row: Charts (Verdict Distribution Pie + Model Feature Weights) -->
+      <div class="grid grid--2" style="margin-bottom: 32px;">
+        
+        <!-- Doughnut / Pie Chart Card -->
+        <div class="card card--glow">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 class="text-h3">Verdict Distribution</h3>
+            <span class="badge badge--accent">Corpus Ratio</span>
+          </div>
+
+          <div class="chart-container" style="height: 280px; display: flex; align-items: center; justify-content: center;">
+            <canvas id="summaryPieChart"></canvas>
+          </div>
+          <p class="text-small text-center" style="margin-top: 16px;">
+            Real-time classification breakdown across all analyzed web addresses.
+          </p>
+        </div>
+
+        <!-- Global Feature Importance Bar Chart -->
+        <div class="card card--glow">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 class="text-h3">Global Predictive Weights</h3>
+            <span class="badge badge--safe">Random Forest</span>
+          </div>
+
+          <div style="height: 280px; position: relative;">
+            <canvas id="featureWeightsChart"></canvas>
+          </div>
+          <p class="text-small text-center" style="margin-top: 16px;">
+            Gini split importance ranking across 14 extracted lexical dimensions.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Threat Telemetry Feed / Table Card -->
+      <div class="card" style="margin-bottom: 32px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h3 class="text-h3">Live Scan Activity & IOC Log</h3>
+            <p class="text-small">Every inspected target and community submission recorded with forensic metadata.</p>
+          </div>
+
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <!-- Filter Dropdown -->
+            <select id="verdictFilter" class="form-select" style="width: auto; padding: 8px 14px; font-size: 0.85rem;" onchange="applyFilters()">
+              <option value="ALL">All Verdicts</option>
+              <option value="PHISHING">Phishing Only</option>
+              <option value="SUSPICIOUS">Suspicious Only</option>
+              <option value="SAFE">Safe Only</option>
+            </select>
+
+            <!-- Search Input -->
+            <input 
+              type="text" 
+              id="tableSearch" 
+              class="form-input" 
+              placeholder="Search by domain or keyword..." 
+              style="width: 220px; padding: 8px 14px; font-size: 0.85rem;" 
+              oninput="applyFilters()"
+            >
+
+            <button type="button" class="btn btn--secondary btn--sm" onclick="exportTableToCSV()">
+              <span>Export CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Scans Table -->
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Target URL</th>
+                <th>Category</th>
+                <th>Risk Score</th>
+                <th>Verdict</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="scansTableBody">
+              <tr>
+                <td colspan="6" class="text-center" style="padding: 40px; color: var(--text-muted);">
+                  Loading telemetry feed...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Model Specs & Validation Metrics Card -->
+      <div class="card card--glass">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+          <h3 class="text-h3">Classifier Model Specification</h3>
+          <span class="badge badge--accent" id="modelStatusBadge">Supervised ML v2.4 Active</span>
+        </div>
+
+        <div class="grid grid--4" style="margin-bottom: 16px;">
+          <div>
+            <div class="text-small">Training Corpus</div>
+            <div style="font-weight: 700; color: var(--text-primary);" id="metaRows">-</div>
+          </div>
+          <div>
+            <div class="text-small">Holdout Accuracy</div>
+            <div style="font-weight: 700; color: var(--safe);" id="metaAccuracy">-</div>
+          </div>
+          <div>
+            <div class="text-small">Precision / Recall</div>
+            <div style="font-weight: 700; color: var(--accent);" id="metaPrecisionRecall">-</div>
+          </div>
+          <div>
+            <div class="text-small">Holdout F1-Score</div>
+            <div style="font-weight: 700; color: var(--safe);" id="metaF1">-</div>
+          </div>
+        </div>
+
+        <p class="text-small" id="metaNote" style="color: var(--text-muted);">
+          Evaluation metrics measured on a held-out test split of the current training dataset.
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img src="assets/solace-logo.png" alt="SOLACE" class="footer__logo">
+        <span class="footer__name">SOLACE</span>
+      </div>
+
+      <div class="footer__links">
+        <a href="index.html" class="footer__link">Home</a>
+        <a href="scanner.html" class="footer__link">Scanner</a>
+        <a href="dashboard.html" class="footer__link">Dashboard</a>
+        <a href="about.html" class="footer__link">About & Architecture</a>
+      </div>
+
+      <div class="footer__copy">
+        Software Engineering Capstone Project © 2026
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/solace.js"></script>
+  <script>
+    let summaryChartInstance = null;
+    let weightsChartInstance = null;
+    let allScans = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchDashboardData();
+    });
+
+    async function fetchDashboardData() {
+      try {
+        // Parallel fetch analytics summary, scans list, and model info
+        const [summary, scansResp, modelResp] = await Promise.all([
+          window.Solace.api.summary().catch(() => ({ total_scans: 0, phishing: 0, suspicious: 0, safe: 0 })),
+          window.Solace.api.scans(200).catch(() => ({ items: [] })),
+          window.Solace.api.model().catch(() => null),
+        ]);
+
+        // 1. Update Stat Counters
+        document.getElementById('statTotalScans').textContent = summary.total_scans;
+        document.getElementById('statPhishing').textContent = summary.phishing;
+        document.getElementById('statSuspicious').textContent = summary.suspicious;
+        document.getElementById('statSafe').textContent = summary.safe;
+
+        // 2. Render Summary Pie Chart
+        const pieCanvas = document.getElementById('summaryPieChart');
+        if (summaryChartInstance) summaryChartInstance.destroy();
+        summaryChartInstance = window.Solace.charts.createSummaryPie(pieCanvas, {
+          safe: summary.safe || (summary.total_scans === 0 ? 1 : 0),
+          suspicious: summary.suspicious || 0,
+          phishing: summary.phishing || 0
+        });
+
+        // 3. Render Model Feature Weights Chart
+        if (modelResp && modelResp.feature_importance) {
+          const weightsCanvas = document.getElementById('featureWeightsChart');
+          if (weightsChartInstance) weightsChartInstance.destroy();
+          weightsChartInstance = window.Solace.charts.createFeatureChart(weightsCanvas, modelResp.feature_importance, 7);
+
+          // Update Model Specs Card
+          document.getElementById('metaRows').textContent = (modelResp.training_rows || 0) + ' Samples';
+          if (modelResp.metrics) {
+            document.getElementById('metaAccuracy').textContent = (modelResp.metrics.accuracy * 100).toFixed(1) + '%';
+            document.getElementById('metaPrecisionRecall').textContent = `${(modelResp.metrics.precision * 100).toFixed(1)}% / ${(modelResp.metrics.recall * 100).toFixed(1)}%`;
+            document.getElementById('metaF1').textContent = (modelResp.metrics.f1 * 100).toFixed(1) + '%';
+          }
+          if (modelResp.metrics_note) {
+            document.getElementById('metaNote').textContent = modelResp.metrics_note;
+          }
+        }
+
+        // 4. Populate Table
+        allScans = scansResp.items || [];
+        applyFilters();
+
+      } catch (err) {
+        window.Solace.ui.showToast('Failed to load telemetry data: ' + err.message, 'error');
+      }
+    }
+
+    function applyFilters() {
+      const verdictFilter = document.getElementById('verdictFilter').value;
+      const search = document.getElementById('tableSearch').value.toLowerCase().trim();
+      const tbody = document.getElementById('scansTableBody');
+
+      let filtered = allScans;
+      if (verdictFilter !== 'ALL') {
+        filtered = filtered.filter(s => s.verdict === verdictFilter);
+      }
+      if (search) {
+        filtered = filtered.filter(s => s.url.toLowerCase().includes(search) || (s.category && s.category.toLowerCase().includes(search)));
+      }
+
+      tbody.innerHTML = '';
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center" style="padding: 30px; color: var(--text-muted);">
+              No scan entries match the selected filters.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const tr = document.createElement('tr');
+        const badgeClass = window.Solace.ui.verdictClass(item.verdict);
+        const encodedUrl = encodeURIComponent(item.url);
+
+        tr.innerHTML = `
+          <td class="text-small text-mono">${window.Solace.ui.esc(item.timestamp || '-')}</td>
+          <td class="table__url" title="${window.Solace.ui.esc(item.url)}">${window.Solace.ui.esc(item.url)}</td>
+          <td><span class="badge" style="background: var(--bg-card);">${window.Solace.ui.esc(item.category || 'Live Scanner')}</span></td>
+          <td style="font-weight: 700; color: ${item.riskScore >= 75 ? 'var(--danger)' : item.riskScore >= 45 ? 'var(--warning)' : 'var(--safe)'};">
+            ${item.riskScore}%
+          </td>
+          <td><span class="badge ${badgeClass}">${item.verdict}</span></td>
+          <td style="text-align: right;">
+            <a href="scanner.html?url=${encodedUrl}" class="btn btn--secondary btn--sm" style="padding: 4px 10px; font-size: 0.75rem;">
+              Re-Scan ↗
+            </a>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function confirmClearHistory() {
+      if (!confirm('Are you sure you want to clear all stored scan history? This action cannot be undone.')) return;
+      try {
+        await window.Solace.api.clear();
+        window.Solace.ui.showToast('Scan history cleared.', 'success');
+        fetchDashboardData();
+      } catch (err) {
+        window.Solace.ui.showToast('Could not clear scans: ' + err.message, 'error');
+      }
+    }
+
+    function exportTableToCSV() {
+      if (!allScans.length) {
+        window.Solace.ui.showToast('No scan records to export.', 'warning');
+        return;
+      }
+      let csv = 'Timestamp,URL,Category,RiskScore,Verdict\n';
+      allScans.forEach(row => {
+        const escapedUrl = `"${(row.url || '').replace(/"/g, '""')}"`;
+        const category = `"${(row.category || '').replace(/"/g, '""')}"`;
+        csv += `${row.timestamp},${escapedUrl},${category},${row.riskScore},${row.verdict}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `solace_threat_telemetry_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>

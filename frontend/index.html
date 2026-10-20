@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOLACE — AI Phishing Threat Intelligence</title>
+  <link rel="icon" type="image/png" href="assets/solace-logo.png">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="nav" id="topNav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="SOLACE Home">
+        <img src="assets/solace-logo.png" alt="SOLACE Logo" class="nav__logo">
+        <span class="nav__wordmark">SOLACE</span>
+      </a>
+
+      <nav class="nav__links" id="navLinks">
+        <a href="index.html" class="nav__link nav__link--active">Home</a>
+        <a href="scanner.html" class="nav__link">Scanner</a>
+        <a href="dashboard.html" class="nav__link">Dashboard</a>
+        <a href="about.html" class="nav__link">About</a>
+      </nav>
+
+      <div class="nav__cta">
+        <a href="scanner.html" class="btn btn--primary btn--sm">
+          <span>Scan a link</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+        </a>
+      </div>
+
+      <button class="nav__toggle" id="navToggle" aria-label="Toggle Navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero__bg">
+      <video class="hero__video" autoplay muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true">
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260808_064556_051587f1-74a1-4336-8c05-4dde3594ed05.mp4" type="video/mp4">
+      </video>
+      <div class="hero__overlay"></div>
+      <div class="hero__glow hero__glow--orange"></div>
+      <div class="hero__glow hero__glow--warm"></div>
+    </div>
+
+    <div class="container hero__content">
+      <div class="section__eyebrow">
+        <span>✦</span> AI Threat Intelligence v2.4
+      </div>
+
+      <h1 class="text-display hero__title">
+        Read the address.<br>
+        <span class="text-gradient">Before you trust it.</span>
+      </h1>
+
+      <p class="hero__subtitle">
+        SOLACE evaluates 14 structural, lexical, and heuristic vectors in under 50ms using machine learning — without ever opening or visiting deceptive destinations.
+      </p>
+
+      <!-- Instant URL Scan Launcher -->
+      <div class="hero__scan-box" style="margin-bottom: 28px; max-width: 640px;">
+        <form id="heroScanForm" class="input-group" onsubmit="handleHeroSubmit(event)">
+          <input 
+            type="text" 
+            id="heroUrlInput" 
+            class="input-group__input" 
+            placeholder="Paste any link to analyze (e.g. secure-login.paypaI.com)..." 
+            autocomplete="off" 
+            spellcheck="false"
+            required
+          >
+          <button type="submit" class="btn btn--primary input-group__btn">
+            <span>Analyze Link</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </form>
+
+        <div style="display: flex; gap: 10px; align-items: center; margin-top: 12px; font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap;">
+          <span>Try sample:</span>
+          <button type="button" class="btn btn--ghost btn--sm" style="padding: 4px 10px; font-size: 0.75rem;" onclick="setHeroSample('http://paypal-security.account-update.xyz/login')">Phishing sample</button>
+          <button type="button" class="btn btn--ghost btn--sm" style="padding: 4px 10px; font-size: 0.75rem;" onclick="setHeroSample('https://github.com/scikit-learn/scikit-learn')">Legit sample</button>
+          <button type="button" class="btn btn--ghost btn--sm" style="padding: 4px 10px; font-size: 0.75rem;" onclick="setHeroSample('http://192.168.1.100@login-verify.top')">Obfuscated sample</button>
+        </div>
+      </div>
+
+      <div class="hero__actions">
+        <a href="scanner.html" class="btn btn--secondary btn--lg">
+          <span>Explore Deep Scanner</span>
+        </a>
+        <a href="dashboard.html" class="btn btn--ghost btn--lg">
+          <span>Live Telemetry</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Stats Ribbon -->
+  <section class="stats-ribbon">
+    <div class="container stats-ribbon__grid">
+      <div class="stat">
+        <div class="stat__value stat__value--accent" data-count="14850" data-suffix="+">0</div>
+        <div class="stat__label">URLs Analyzed in Corpus</div>
+      </div>
+      <div class="stat">
+        <div class="stat__value stat__value--safe" data-count="98.1" data-suffix="%" data-decimals="1">0%</div>
+        <div class="stat__label">Holdout Model F1-Score</div>
+      </div>
+      <div class="stat">
+        <div class="stat__value" data-count="42" data-prefix="<" data-suffix="ms">0ms</div>
+        <div class="stat__label">Mean ML Inference Latency</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Modules / Features -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: 64px;">
+        <div class="section__eyebrow">Enterprise Protection</div>
+        <h2 class="text-h1 section__title">Engineered for Zero-Hour Deception</h2>
+        <p class="section__subtitle section__subtitle--center">
+          Traditional blocklists lag behind newly registered attacker domains. SOLACE computes lexical indicators at inception time.
+        </p>
+      </div>
+
+      <div class="grid grid--3">
+        <div class="card card--glow fade-in">
+          <div class="icon-box">🛡️</div>
+          <h3 class="text-h3" style="margin-bottom: 12px;">Zero-Execution Sandbox</h3>
+          <p class="text-body text-small">
+            Addresses are parsed strictly at the lexical protocol layer. SOLACE never connects to the target server, executes JavaScript, or downloads payloads.
+          </p>
+        </div>
+
+        <div class="card card--glow fade-in">
+          <div class="icon-box">⚡</div>
+          <h3 class="text-h3" style="margin-bottom: 12px;">Random Forest ML Engine</h3>
+          <p class="text-body text-small">
+            A 220-tree supervised ensemble analyzes Shannon hostname entropy, suspicious brand anchors, digit distributions, and subdomain nesting.
+          </p>
+        </div>
+
+        <div class="card card--glow fade-in">
+          <div class="icon-box">📊</div>
+          <h3 class="text-h3" style="margin-bottom: 12px;">Explainable Threat Telemetry</h3>
+          <p class="text-body text-small">
+            No black-box scores. Every verdict delivers transparent feature-importance breakdowns, risk gauges, and crowd-sourced IOC telemetry.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works (3 Steps) -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: 64px;">
+        <div class="section__eyebrow">Detection Workflow</div>
+        <h2 class="text-h1 section__title">How SOLACE Evaluates Links</h2>
+        <p class="section__subtitle section__subtitle--center">
+          From submission to deterministic verdict in 3 coordinated computational stages.
+        </p>
+      </div>
+
+      <div class="steps">
+        <div class="step fade-in">
+          <div class="step__number">1</div>
+          <h4 class="step__title">Normalization</h4>
+          <p class="step__desc">
+            Decodes percent encodings, strips credentials, detects raw IP addresses, and breaks URLs into protocol, subdomain, registered domain, and path.
+          </p>
+        </div>
+
+        <div class="step fade-in">
+          <div class="step__number">2</div>
+          <h4 class="step__title">Feature Extraction</h4>
+          <p class="step__desc">
+            Computes 14 distinct mathematical signals: Shannon entropy, lexical lure count, hyphen density, and high-abuse top-level domains.
+          </p>
+        </div>
+
+        <div class="step fade-in">
+          <div class="step__number">3</div>
+          <h4 class="step__title">Inference & XAI</h4>
+          <p class="step__desc">
+            Scikit-learn Random Forest scores the feature vector. Output includes an actionable verdict: SAFE, SUSPICIOUS, or PHISHING.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call To Action Banner -->
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="cta-banner">
+        <div class="section__eyebrow">Instant Verification</div>
+        <h2 class="text-h1" style="margin-bottom: 16px;">
+          Unmask Deceptive Links in Milliseconds
+        </h2>
+        <p class="section__subtitle section__subtitle--center" style="margin-bottom: 32px;">
+          Test any URL now with SOLACE's interactive scanner, complete with 3D risk gauges and structural feature breakdowns.
+        </p>
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+          <a href="scanner.html" class="btn btn--primary btn--lg">
+            <span>Launch Deep Scanner</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+          </a>
+          <a href="dashboard.html" class="btn btn--secondary btn--lg">
+            <span>View Live Telemetry</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img src="assets/solace-logo.png" alt="SOLACE" class="footer__logo">
+        <span class="footer__name">SOLACE</span>
+      </div>
+
+      <div class="footer__links">
+        <a href="index.html" class="footer__link">Home</a>
+        <a href="scanner.html" class="footer__link">Scanner</a>
+        <a href="dashboard.html" class="footer__link">Dashboard</a>
+        <a href="about.html" class="footer__link">About & Architecture</a>
+      </div>
+
+      <div class="footer__copy">
+        Software Engineering Capstone Project © 2026
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/solace.js"></script>
+  <script>
+    function setHeroSample(url) {
+      const input = document.getElementById('heroUrlInput');
+      input.value = url;
+      input.focus();
+    }
+
+    function handleHeroSubmit(e) {
+      e.preventDefault();
+      const url = document.getElementById('heroUrlInput').value.trim();
+      if (!url) return;
+      window.location.href = `scanner.html?url=${encodeURIComponent(url)}`;
+    }
+  </script>
+</body>
+</html>

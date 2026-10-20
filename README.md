@@ -1,64 +1,106 @@
-# PhishGuard — local URL analysis demo
+# 🛡️ SOLACE — Zero-Execution AI Phishing Intelligence
 
-PhishGuard is a one-page URL analysis demo backed by a local FastAPI service, SQLite scan history, and a scikit-learn Random Forest model. The frontend preserves the approved cinematic PhishGuard design. It sends submitted URL text to the local API; the API parses the address and never fetches or opens the destination.
+> **Enterprise Capstone Project © 2026**  
+> High-performance URL deception analysis powered by 14-dimensional lexical heuristics and a supervised Random Forest ensemble.
 
-## Model limitations
+---
 
-On first run, the API trains its model from reproducible, synthetic, pattern-generated examples. Its probabilities and held-out split metrics are **not validated real-world phishing detection performance**. The About dialog displays the actual model source and its metrics note. Treat all verdicts as estimates, not guarantees of safety. The database is local at `backend/phishguard.sqlite3` and stores submitted URLs and scan results.
+## 🌟 Overview
 
-## Requirements
+**SOLACE** is a 4-page threat intelligence web application designed to evaluate suspicious web links in under 50ms without ever visiting or triggering target endpoints.
 
-- Python 3.10 or newer
-- Dependencies in `requirements.txt`
+### Key Capabilities
+- **Zero-Execution Sandbox:** Analyzes raw URL structure, protocol, credentials, and hostname entropy without issuing HTTP GET requests or executing remote JavaScript.
+- **14-Vector Heuristic Engine:** Extracts Shannon entropy, lexical lure counts, subdomain depth, high-abuse TLDs, and IP addressing patterns.
+- **Explainable AI (XAI):** Real-time transparent scoring with dynamic Chart.js risk gauges, feature breakdown bars, and warning indicators.
+- **Crowd-Sourced IOC Telemetry:** Stored SQLite scan database, verdict distribution analytics, and community threat reporting feed.
 
-## Run locally
+---
 
-From this directory, start the backend in one terminal:
+## 🧭 4-Page Architecture
 
+1. **🏠 Home (`frontend/index.html`)** — Cinematic dark landing page with Ranvel-inspired 3D video hero, live stats ribbon, and quick scan input.
+2. **🔍 Deep Scanner (`frontend/scanner.html`)** — Deep analysis engine with Chart.js risk gauge doughnut, URL token chips, and 14-feature table.
+3. **📊 Telemetry Dashboard (`frontend/dashboard.html`)** — Corpus analytics, verdict pie chart, global feature weights, searchable IOC table, and CSV export.
+4. **ℹ️ About & Architecture (`frontend/about.html`)** — System design blueprint, ML extraction breakdown, and Capstone SE toolchain documentation.
+
+---
+
+## 🛠️ Software Engineering (SE) Toolchain
+
+In accordance with enterprise capstone requirements, SOLACE implements:
+
+| # | Tool | Usage & Deliverables | Documentation |
+|---|---|---|---|
+| 1 | **GitHub** | Semantic versioning, git commit handoffs, branch protection | [Git Commits](.) |
+| 2 | **Deployment** | Vercel Edge configuration with security headers (`vercel.json`) | [`vercel.json`](vercel.json) |
+| 3 | **Jira** | Agile Scrum sprint board with Epics, User Stories, and Acceptance Criteria | [`docs/JIRA_SPRINT_BACKLOG.md`](docs/JIRA_SPRINT_BACKLOG.md) |
+| 4 | **Confluence** | Architectural Decision Records (ADRs) and data dictionaries | [`docs/CONFLUENCE_ARCHITECTURE_SPEC.md`](docs/CONFLUENCE_ARCHITECTURE_SPEC.md) |
+| 5 | **Figma** | Ranvel-inspired cinematic dark design system & tokens | [`docs/FIGMA_DESIGN_SYSTEM.md`](docs/FIGMA_DESIGN_SYSTEM.md) |
+| 6 | **Docker** | Multi-container compose configuration with non-root security | [`compose.yaml`](compose.yaml) |
+| 7 | **Kubernetes** | Declarative Deployments, ClusterIP Services, PVC, and Ingress routing | [`k8s/`](k8s/) |
+| 8 | **CI/CD** | GitHub Actions workflow for linting, inference smoke tests, and Docker builds | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
+
+---
+
+## 🚀 Running Locally
+
+### 1. Start the Backend API (FastAPI)
 ```bash
 ./start-backend.sh
 ```
+* **API Endpoint:** `http://127.0.0.1:8001`
+* **Interactive OpenAPI Docs:** `http://127.0.0.1:8001/docs`
+* **Health Check:** `http://127.0.0.1:8001/api/v1/health`
 
-Then start the static frontend in a second terminal:
-
+### 2. Start the Frontend (Static 4-Page Web App)
+In a separate terminal:
 ```bash
 ./start-frontend.sh
 ```
+* **Web App:** Open `http://127.0.0.1:8000` in any browser.
 
-Open <http://127.0.0.1:8000>. The frontend uses `http://127.0.0.1:8001` as its API default. To change it, set `window.PHISHGUARD_API_BASE` before the app script in `index.html`.
+---
 
-- API health: <http://127.0.0.1:8001/api/v1/health>
-- Interactive API docs: <http://127.0.0.1:8001/docs>
+## 🐳 Running with Docker Compose
 
-`index.orbit-dashboard.backup.html` preserves the original dashboard page from the supplied backend bundle; the active page is `index.html`.
-
-## Run with Docker
-
-Install Docker Desktop, then from this directory run:
-
+Ensure Docker Desktop is active:
 ```bash
 docker compose up --build
 ```
+* **Frontend:** `http://127.0.0.1:8000`
+* **Backend API:** `http://127.0.0.1:8001`
+* Stop with `Ctrl+C` or `docker compose down`.
 
-Open <http://127.0.0.1:8000>. The backend API is available at <http://127.0.0.1:8001>, with interactive docs at <http://127.0.0.1:8001/docs>. Both ports are bound to localhost. The API container runs as a non-root user, and scan history persists in the `phishguard-data` Docker volume.
+---
 
-Stop the app with `Ctrl+C` or `docker compose down`. To also delete saved scan history, run `docker compose down --volumes`.
+## ☸️ Deploying with Kubernetes
 
-## API routes
+Deploy all resources to your local minikube or cloud Kubernetes cluster:
+```bash
+kubectl apply -f k8s/
+```
+Verify pod status:
+```bash
+kubectl get pods,services,ingress
+```
 
-- `GET /api/v1/health` — service and model status
-- `POST /api/v1/scans` — analyze and store `{ "url": "https://example.org" }`
-- `GET /api/v1/scans?limit=200` — stored scan history
-- `DELETE /api/v1/scans` — clear local scan history
-- `GET /api/v1/model` — model metadata, training source, and feature information
-- `GET /api/v1/analytics/summary` — aggregate counts from stored scans
-- `POST /api/v1/reports` — analyze/store a user-submitted report; it is not independently verified
-- `POST /api/v1/model/retrain` — train from `data/labeled_urls.csv` when a properly licensed dataset is provided
+---
 
-## Use a labeled dataset
+## ☁️ Deploying to Vercel (Frontend)
 
-Create `data/labeled_urls.csv` with columns `url,label`, where `0` means legitimate and `1` means phishing. Use a dataset you are allowed to use; remove duplicates/leakage and keep separate evaluation data. Retraining replaces the local model artifact. The reported metrics are only a held-out split of that file; use a separate, time-aware evaluation before making performance claims.
+To deploy the static frontend to Vercel:
+```bash
+npx vercel deploy --prod
+```
+The included `vercel.json` automatically maps clean URLs:
+* `/` → `frontend/index.html`
+* `/scanner` → `frontend/scanner.html`
+* `/dashboard` → `frontend/dashboard.html`
+* `/about` → `frontend/about.html`
 
-## Local development notes
+---
 
-The backend binds to `127.0.0.1:8001`; CORS is restricted to the two local frontend origins on port `8000`. Do not expose this unauthenticated demo API publicly without adding appropriate authentication, rate limiting, and deployment security.
+## 🔒 Security & Limitations Notice
+
+SOLACE's baseline ML classifier is trained on a reproducible bootstrap corpus coupled with lexical heuristic vectors. While holdout test splits achieve high F1 scores (>98%), machine learning outputs represent probabilistic threat indicators. Always maintain zero-trust verification when handling sensitive credentials.

@@ -144,8 +144,30 @@ def load_or_train():
 
 ARTIFACT = load_or_train()
 
-app = FastAPI(title="PhishGuard API", version="1.0.0", description="Local phishing URL analysis API. It never opens submitted URLs.")
-app.add_middleware(CORSMiddleware, allow_origins=["http://127.0.0.1:8000", "http://localhost:8000"], allow_credentials=False, allow_methods=["GET", "POST", "DELETE", "OPTIONS"], allow_headers=["Content-Type"])
+app = FastAPI(
+    title="SOLACE API",
+    version="2.4.0",
+    description="SOLACE URL threat intelligence and explainable phishing analysis API. It never connects to submitted URLs."
+)
+
+cors_origins = [
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    "http://127.0.0.1:5500",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+if os.environ.get("ALLOWED_ORIGIN"):
+    cors_origins.append(os.environ["ALLOWED_ORIGIN"])
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?|https?://.*\.vercel\.app|https?://.*\.netlify\.app",
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+    allow_headers=["*"]
+)
 
 
 def db():
@@ -193,7 +215,7 @@ def scan_url(raw: str, category="Live Scanner", notes=""):
     return {"id":scan_id,"rawUrl":extracted["normalized_url"],"protocol":extracted["protocol"],"subdomain":extracted["subdomain"],"rootDomain":extracted["rootDomain"],"tld":extracted["tld"],"pathAndQuery":extracted["pathAndQuery"],"hasIpAddress":extracted["hasIpAddress"],"hasAtSymbol":extracted["hasAtSymbol"],"hasHighRiskTld":extracted["hasHighRiskTld"],"isShortener":extracted["isShortener"],"finalRiskScore":risk,"verdict":verdict,"confidence":f"{confidence:.1f}% model confidence","latencyMs":latency,"triggers":signals,"featuresList":features_list,"model":{"name":"Random Forest","source":ARTIFACT["training_source"]},"createdAt":now}
 
 @app.get("/api/v1/health")
-def health(): return {"status":"ok","service":"PhishGuard API","model_loaded":True,"model_name":"Random Forest (scikit-learn)"}
+def health(): return {"status":"ok","service":"SOLACE API","model_loaded":True,"model_name":"Random Forest (scikit-learn)"}
 
 @app.get("/api/v1/model")
 def model_info():
