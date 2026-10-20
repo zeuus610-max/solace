@@ -20,6 +20,7 @@
 
 | Path | Purpose |
 |---|---|
+| `CODEX_DEVELOPER_MANUAL.md` | **Codex Master Blueprint:** Comprehensive developer guide, all-file inventory, architectural invariants, and v3.0 upgrade feature specifications. |
 | `frontend/index.html` | **Page 1 (Home):** Cinematic Ranvel-style landing page with 3D looping video hero, stats ribbon, quick scan launcher, and feature grid. |
 | `frontend/scanner.html` | **Page 2 (Scanner):** Deep analysis engine with Chart.js doughnut gauge, URL token chips, 14-feature horizontal bar chart, and community reporting drawer. |
 | `frontend/dashboard.html` | **Page 3 (Dashboard):** Live threat telemetry, verdict distribution pie chart, global model weights bar chart, and searchable IOC log with CSV export. |
