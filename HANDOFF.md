@@ -1,9 +1,28 @@
 # SOLACE — AI Handoff Note
 
 > **Last updated by:** Antigravity (Google Gemini)  
-> **Timestamp:** 2026-10-20T12:47Z  
-> **Git commit:** `2d59bae` — "feat(solace): complete 4-page UI, Chart.js visuals, K8s manifests, CI/CD, and SE capstone docs"  
-> **Platform Version:** SOLACE v2.4 (Rebrand & Capstone Upgrade)  
+> **Timestamp:** 2026-10-24T12:53Z  
+> **Git commit:** `90624f6` — "feat: add run.sh one-command launcher"  
+> **Platform Version:** SOLACE v2.4 (Rebrand & Capstone Upgrade Complete)  
+> **Next Version / Owner:** SOLACE v3.0 → **Codex (OpenAI)**  
+
+---
+
+## ⚡ MASTER HANDOFF FOR CODEX
+
+👉 **For the complete, single-source-of-truth developer guide, read:**  
+**[`CODEX_FINAL_HANDOFF.md`](file:///Users/tharun/Desktop/phishguard-backend/CODEX_FINAL_HANDOFF.md)**
+
+It contains:
+- Complete file inventory and lines of code breakdown
+- Complete full source code embedded directly for zero-friction reference
+- Design system tokens and styling rules
+- Exact API contracts and request/response JSON shapes
+- Infrastructure (Docker, Kubernetes, CI/CD, Vercel)
+- All 8 Capstone SE tools verification status
+- v3.0 Feature specifications (Typosquatting/Levenshtein detector, Multi-Model Ensemble, SOC Threat Dossier, Real dataset retraining)
+- Step-by-step execution protocol and commands for Codex
+- Complete wishlist of creative enhancements  
 
 ---
 
