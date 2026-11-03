@@ -2,6 +2,8 @@
 
 SOLACE is a URL risk analysis capstone project. It examines the URL string locally using structural features and a Random Forest model. It does not open or fetch the submitted URL.
 
+**Open the live app:** [https://dynamic-gumdrop-be2451.netlify.app](https://dynamic-gumdrop-be2451.netlify.app)
+
 ## What is in this repository?
 
 This repository contains two application implementations:
@@ -13,7 +15,7 @@ The two implementations share the product design and scoring approach, but their
 
 ## Pages
 
-Both applications provide the Home, Scanner, Dashboard, and About pages. In the Python version, the frontend is served at `http://127.0.0.1:8000/`; the other pages are available at `/scanner.html`, `/dashboard.html`, and `/about.html`.
+The live Netlify app includes the Home, Scanner, Dashboard, and About pages. The Python version can also be run locally at `http://127.0.0.1:8000/`; its other pages are available at `/scanner.html`, `/dashboard.html`, and `/about.html`.
 
 ## Run the Python application locally
 
