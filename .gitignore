@@ -5,3 +5,7 @@ backend/phishguard.sqlite3
 backend/phishguard_model.joblib
 .env
 .DS_Store
+.appdeploy
+/appdeploy-solace/node_modules/
+/appdeploy-solace/dist/
+/appdeploy-solace/.netlify/

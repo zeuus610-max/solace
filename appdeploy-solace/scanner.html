@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep URL Scanner — SOLACE</title>
+  <link rel="icon" type="image/png" href="/resources/assets/solace-logo.png">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="nav" id="topNav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="SOLACE Home">
+        <img src="/resources/assets/solace-logo.png" alt="SOLACE Logo" class="nav__logo">
+        <span class="nav__wordmark">SOLACE</span>
+      </a>
+
+      <nav class="nav__links" id="navLinks">
+        <a href="index.html" class="nav__link">Home</a>
+        <a href="scanner.html" class="nav__link nav__link--active">Scanner</a>
+        <a href="dashboard.html" class="nav__link">Dashboard</a>
+        <a href="about.html" class="nav__link">About</a>
+      </nav>
+
+      <div class="nav__cta">
+        <a href="dashboard.html" class="btn btn--secondary btn--sm">
+          <span>Telemetry Stream</span>
+        </a>
+      </div>
+
+      <button class="nav__toggle" id="navToggle" aria-label="Toggle Navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Scanner Main Section -->
+  <main class="section" style="padding-top: 130px; min-height: 80vh;">
+    <div class="container">
+      
+      <!-- Page Header -->
+      <div class="text-center" style="margin-bottom: 40px;">
+        <div class="section__eyebrow">Zero-Execution Sandbox</div>
+        <h1 class="text-h1 section__title">Deep URL Analysis Engine</h1>
+        <p class="section__subtitle section__subtitle--center">
+          Evaluate deceptive structures, Shannon entropy, and 14 predictive signals safely before any connection is made.
+        </p>
+      </div>
+
+      <!-- Search Input Card -->
+      <div class="card card--glow" style="margin-bottom: 40px;">
+        <form id="scannerForm" onsubmit="handleScanSubmit(event)">
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="urlInput" 
+              class="input-group__input" 
+              placeholder="Enter complete or partial URL (e.g., https://appleid.apple.com-verify.xyz/auth)..." 
+              autocomplete="off" 
+              spellcheck="false"
+              required
+            >
+            <button type="submit" id="scanSubmitBtn" class="btn btn--primary input-group__btn">
+              <span id="btnText">Analyze Target</span>
+              <div id="btnSpinner" class="spinner" style="display: none;"></div>
+            </button>
+          </div>
+        </form>
+
+        <div style="display: flex; gap: 10px; align-items: center; margin-top: 16px; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap;">
+          <span style="font-weight: 500;">Quick Presets:</span>
+          <button type="button" class="btn btn--ghost btn--sm" onclick="setScannerPreset('http://paypal-verification.security-notice-24.top/signin')">Phishing Bank Lure</button>
+          <button type="button" class="btn btn--ghost btn--sm" onclick="setScannerPreset('https://docs.github.com/en/rest/quickstart')">Genuine Reference</button>
+          <button type="button" class="btn btn--ghost btn--sm" onclick="setScannerPreset('http://192.168.1.102/account/confirm-identity')">Raw IP Host</button>
+          <button type="button" class="btn btn--ghost btn--sm" onclick="setScannerPreset('http://google.com@attacker-portal.ru/oauth')">Credential Obfuscation</button>
+        </div>
+      </div>
+
+      <!-- Results Display Container (Initially Hidden) -->
+      <div id="resultsSection" style="display: none;" class="fade-in">
+        
+        <!-- Top Row: Verdict Card + URL Breakdown & Signals -->
+        <div class="grid grid--2" style="margin-bottom: 32px;">
+          
+          <!-- Verdict & Gauge Ring Card -->
+          <div class="card card--glow" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 24px;">
+            <div id="verdictBadge" class="badge" style="font-size: 0.95rem; padding: 8px 20px; margin-bottom: 24px;">
+              VERDICT
+            </div>
+
+            <!-- Doughnut Gauge Chart -->
+            <div class="verdict-ring" style="margin-bottom: 24px;">
+              <canvas id="verdictChart"></canvas>
+              <div class="verdict-ring__label">
+                <span id="riskScoreVal" class="verdict-ring__score">0%</span>
+                <span id="riskScoreLabel" class="verdict-ring__text">RISK SCORE</span>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 20px; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">
+              <div>Model: <strong id="modelNameText" style="color: var(--text-primary);">Random Forest</strong></div>
+              <div>Confidence: <strong id="confidenceText" style="color: var(--text-primary);">0%</strong></div>
+              <div>Latency: <strong id="latencyText" style="color: var(--text-primary);">0ms</strong></div>
+            </div>
+
+            <p id="verdictSummary" class="text-small" style="max-width: 380px;">
+              Evaluation completed.
+            </p>
+          </div>
+
+          <!-- URL Structural Breakdown & Warning Triggers -->
+          <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <h3 class="text-h3" style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                <span>Structural Breakdown</span>
+                <span class="text-small text-mono" id="normalizedUrlPreview" style="color: var(--accent); font-weight: normal; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
+              </h3>
+
+              <!-- Decomposition Chips -->
+              <div class="url-breakdown" id="chipsContainer">
+                <div class="chip"><span class="chip__label">Protocol</span><span class="chip__val" id="chipProtocol">-</span></div>
+                <div class="chip"><span class="chip__label">Subdomain</span><span class="chip__val" id="chipSubdomain">-</span></div>
+                <div class="chip"><span class="chip__label">Root Domain</span><span class="chip__val" id="chipRoot">-</span></div>
+                <div class="chip"><span class="chip__label">TLD</span><span class="chip__val" id="chipTld">-</span></div>
+                <div class="chip" style="width: 100%;"><span class="chip__label">Path / Query</span><span class="chip__val" id="chipPath" style="word-break: break-all;">-</span></div>
+              </div>
+
+              <!-- Warning Triggers -->
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 20px 0 12px;">
+                Identified Threat Signals
+              </h4>
+              <div class="signal-list" id="signalsList">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; gap: 12px; justify-content: flex-end;">
+              <button type="button" class="btn btn--secondary btn--sm" onclick="copyAnalysisSummary()">
+                <span>Copy Summary</span>
+              </button>
+              <a href="#reportFormSection" class="btn btn--ghost btn--sm">
+                <span>Flag Discrepancy</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Middle Row: Interactive Feature Extraction Visualizer -->
+        <div class="card" style="margin-bottom: 32px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h3 class="text-h3">14-Dimensional Heuristic Analysis</h3>
+              <p class="text-small">Extracted lexical metrics vs. supervised decision tree splitting weights</p>
+            </div>
+            <div class="badge badge--accent">Zero-Day Prediction Vector</div>
+          </div>
+
+          <div class="grid grid--2" style="align-items: center;">
+            <!-- Horizontal Bar Chart -->
+            <div style="height: 320px; position: relative;">
+              <canvas id="featuresBarChart"></canvas>
+            </div>
+
+            <!-- Detailed Metrics Table -->
+            <div class="table-wrap feature-table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Feature</th>
+                    <th>Measured Value</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="featuresTableBody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom: Threat Reporting Drawer -->
+        <div class="card card--glass" id="reportFormSection">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+              <h3 class="text-h3">Crowd-Sourced IOC Telemetry</h3>
+              <p class="text-small">Submitting shares this URL and note with the community. Routine scans stay in this browser.</p>
+            </div>
+            <span class="badge badge--safe">Community Feed</span>
+          </div>
+
+          <form id="reportForm" onsubmit="handleReportSubmit(event)">
+            <input type="hidden" id="reportTargetUrl">
+            <div class="grid grid--2">
+              <div class="form-group">
+                <label class="form-label" for="reportCategory">Threat Classification</label>
+                <select id="reportCategory" class="form-select">
+                  <option value="Credential Harvest">Credential Harvest / Phish</option>
+                  <option value="Banking & Financial">Banking & Financial Impersonation</option>
+                  <option value="Malware Stager">Malware / Dropper Redirection</option>
+                  <option value="Brand Squatting">Brand Impersonation / Typosquat</option>
+                  <option value="False Positive Dispute">Dispute: Safe Link Flagged Incorrectly</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="reportNotes">Analyst Context / Source</label>
+                <input type="text" id="reportNotes" class="form-input" placeholder="e.g. Received via SMS lure claiming KYC suspension..." maxlength="500">
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn btn--primary btn--sm" id="reportSubmitBtn">
+                <span>Submit Threat Intelligence</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img src="/resources/assets/solace-logo.png" alt="SOLACE" class="footer__logo">
+        <span class="footer__name">SOLACE</span>
+      </div>
+
+      <div class="footer__links">
+        <a href="index.html" class="footer__link">Home</a>
+        <a href="scanner.html" class="footer__link">Scanner</a>
+        <a href="dashboard.html" class="footer__link">Dashboard</a>
+        <a href="about.html" class="footer__link">About & Architecture</a>
+      </div>
+
+      <div class="footer__copy">
+        Software Engineering Capstone Project © 2026
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+  <script>
+    let verdictRingChart = null;
+    let featuresChart = null;
+    let currentScanData = null;
+
+    // Run automatically if ?url= is passed in address bar
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const target = urlParams.get('url');
+      if (target) {
+        document.getElementById('urlInput').value = target;
+        runAnalysis(target);
+      }
+    });
+
+    function setScannerPreset(url) {
+      document.getElementById('urlInput').value = url;
+      runAnalysis(url);
+    }
+
+    function handleScanSubmit(e) {
+      e.preventDefault();
+      const rawUrl = document.getElementById('urlInput').value.trim();
+      if (!rawUrl) return;
+      runAnalysis(rawUrl);
+    }
+
+    async function runAnalysis(url) {
+      const submitBtn = document.getElementById('scanSubmitBtn');
+      const btnText = document.getElementById('btnText');
+      const btnSpinner = document.getElementById('btnSpinner');
+      const resultsSection = document.getElementById('resultsSection');
+
+      submitBtn.disabled = true;
+      btnText.style.display = 'none';
+      btnSpinner.style.display = 'block';
+
+      try {
+        const data = await window.Solace.api.scan(url);
+        currentScanData = data;
+        renderScanResults(data);
+        resultsSection.style.display = 'block';
+        resultsSection.classList.add('visible');
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.Solace.ui.showToast('Analysis completed in ' + data.latencyMs + 'ms', 'success');
+      } catch (err) {
+        window.Solace.ui.showToast(err.message || 'Failed to scan URL. Ensure backend is running.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+      }
+    }
+
+    function renderScanResults(data) {
+      // 1. Verdict & Gauge Ring
+      const badge = document.getElementById('verdictBadge');
+      badge.className = 'badge ' + window.Solace.ui.verdictClass(data.verdict);
+      badge.textContent = data.verdict;
+
+      document.getElementById('riskScoreVal').textContent = data.finalRiskScore + '%';
+      document.getElementById('confidenceText').textContent = data.confidence;
+      document.getElementById('latencyText').textContent = data.latencyMs + 'ms';
+      document.getElementById('modelNameText').textContent = data.model?.name || 'Random Forest';
+      
+      const summaryText = data.verdict === 'PHISHING'
+        ? 'High probability of credential deception, phishing lure, or malicious redirect. Avoid interaction.'
+        : data.verdict === 'SUSPICIOUS'
+        ? 'Heuristic and structural warning signs detected. Manual verification recommended before supplying credentials.'
+        : 'Lexical and structural metrics align with legitimate domain properties. Safe to proceed.';
+      document.getElementById('verdictSummary').textContent = summaryText;
+
+      // Render or Update Verdict Ring Chart
+      const ringCanvas = document.getElementById('verdictChart');
+      if (verdictRingChart) verdictRingChart.destroy();
+      verdictRingChart = window.Solace.charts.createVerdictRing(ringCanvas, data.finalRiskScore, data.verdict);
+
+      // 2. Chips
+      document.getElementById('normalizedUrlPreview').textContent = data.rawUrl;
+      document.getElementById('chipProtocol').textContent = data.protocol || 'http';
+      document.getElementById('chipSubdomain').textContent = data.subdomain || 'None';
+      document.getElementById('chipRoot').textContent = data.rootDomain || '-';
+      document.getElementById('chipTld').textContent = '.' + (data.tld || '-');
+      document.getElementById('chipPath').textContent = data.pathAndQuery || '/';
+
+      // 3. Signals List
+      const signalsList = document.getElementById('signalsList');
+      signalsList.innerHTML = '';
+      (data.triggers || []).forEach(sig => {
+        const item = document.createElement('div');
+        const isDanger = sig.toLowerCase().includes('high phishing') || sig.toLowerCase().includes('ip address') || sig.toLowerCase().includes('@');
+        const isWarning = sig.toLowerCase().includes('elevated') || sig.toLowerCase().includes('keyword') || sig.toLowerCase().includes('subdomain');
+        
+        item.className = 'signal-item ' + (isDanger ? 'signal-item--danger' : isWarning ? 'signal-item--warning' : 'signal-item--safe');
+        item.innerHTML = `<span class="signal-item__icon">${isDanger ? '⚠️' : isWarning ? '⚡' : '✓'}</span><span>${window.Solace.ui.esc(sig)}</span>`;
+        signalsList.appendChild(item);
+      });
+
+      // 4. Feature Extraction Visualizer & Table
+      const featuresTableBody = document.getElementById('featuresTableBody');
+      featuresTableBody.innerHTML = '';
+      (data.featuresList || []).forEach(f => {
+        const tr = document.createElement('tr');
+        const statusBadge = f.status === 'Critical' 
+          ? '<span class="badge badge--phishing">Critical</span>'
+          : f.status === 'Warning'
+          ? '<span class="badge badge--suspicious">Warning</span>'
+          : '<span class="badge badge--safe">Normal</span>';
+
+        tr.innerHTML = `
+          <td>
+            <div style="font-weight: 600; color: var(--text-primary);">${window.Solace.ui.esc(f.name)}</div>
+            <div class="text-small">${window.Solace.ui.esc(f.desc)}</div>
+          </td>
+          <td class="text-mono">${window.Solace.ui.esc(f.value)}</td>
+          <td>${statusBadge}</td>
+        `;
+        featuresTableBody.appendChild(tr);
+      });
+
+      // Render Features Horizontal Bar Chart
+      const barCanvas = document.getElementById('featuresBarChart');
+      if (featuresChart) featuresChart.destroy();
+      featuresChart = window.Solace.charts.createScanFeaturesChart(barCanvas, data.featuresList || []);
+
+      // 5. Populate Report URL
+      document.getElementById('reportTargetUrl').value = data.rawUrl;
+    }
+
+    async function handleReportSubmit(e) {
+      e.preventDefault();
+      const url = document.getElementById('reportTargetUrl').value || document.getElementById('urlInput').value.trim();
+      const category = document.getElementById('reportCategory').value;
+      const notes = document.getElementById('reportNotes').value.trim();
+
+      if (!url) {
+        window.Solace.ui.showToast('Please enter or scan a valid URL first.', 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('reportSubmitBtn');
+      submitBtn.disabled = true;
+
+      try {
+        await window.Solace.api.report({ url, category, notes });
+        window.Solace.ui.showToast('Threat report logged to community database.', 'success');
+        document.getElementById('reportNotes').value = '';
+      } catch (err) {
+        window.Solace.ui.showToast(err.message || 'Error submitting report.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    function copyAnalysisSummary() {
+      if (!currentScanData) return;
+      const summary = `SOLACE URL Threat Analysis:
+Target: ${currentScanData.rawUrl}
+Verdict: ${currentScanData.verdict} (Risk Score: ${currentScanData.finalRiskScore}%)
+Model Confidence: ${currentScanData.confidence}
+Latency: ${currentScanData.latencyMs}ms
+Identified Triggers:
+${(currentScanData.triggers || []).map(t => '- ' + t).join('\n')}
+Generated by SOLACE AI Platform`;
+
+      navigator.clipboard.writeText(summary).then(() => {
+        window.Solace.ui.showToast('Summary copied to clipboard!', 'success');
+      }).catch(() => {
+        window.Solace.ui.showToast('Could not copy summary.', 'error');
+      });
+    }
+  </script>
+</body>
+</html>

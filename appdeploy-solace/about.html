@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About & Architecture — SOLACE</title>
+  <link rel="icon" type="image/png" href="/resources/assets/solace-logo.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="nav" id="topNav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="SOLACE Home">
+        <img src="/resources/assets/solace-logo.png" alt="SOLACE Logo" class="nav__logo">
+        <span class="nav__wordmark">SOLACE</span>
+      </a>
+
+      <nav class="nav__links" id="navLinks">
+        <a href="index.html" class="nav__link">Home</a>
+        <a href="scanner.html" class="nav__link">Scanner</a>
+        <a href="dashboard.html" class="nav__link">Dashboard</a>
+        <a href="about.html" class="nav__link nav__link--active">About</a>
+      </nav>
+
+      <div class="nav__cta">
+        <a href="scanner.html" class="btn btn--primary btn--sm">
+          <span>Scan a link</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+        </a>
+      </div>
+
+      <button class="nav__toggle" id="navToggle" aria-label="Toggle Navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- About Header Section -->
+  <main class="section" style="padding-top: 130px;">
+    <div class="container">
+      
+      <!-- Eyebrow & Title -->
+      <div class="text-center" style="margin-bottom: 56px;">
+        <div class="section__eyebrow">Engineering Architecture</div>
+        <h1 class="text-display section__title">Built to Protect.</h1>
+        <p class="section__subtitle section__subtitle--center">
+          SOLACE is an end-to-end URL threat detection and machine-learning intelligence platform engineered to eliminate drive-by risks and unmask deception in real time.
+        </p>
+      </div>
+
+      <!-- Core Mission Statement -->
+      <div class="card card--glow" style="margin-bottom: 48px; padding: 48px 36px;">
+        <div class="grid grid--2" style="align-items: center;">
+          <div>
+            <h2 class="text-h2" style="margin-bottom: 16px;">The Problem with Traditional Blacklists</h2>
+            <p class="text-body" style="margin-bottom: 16px;">
+              Conventional anti-phishing safeguards rely on public threat intelligence feeds and reputation blacklists. By the time a domain is reported, indexed, and distributed, targeted victims have already submitted credentials.
+            </p>
+            <p class="text-body">
+              <strong>SOLACE takes a zero-execution approach.</strong> By analyzing URL structure, lexical character entropy, token combinations, and structural depth, our ensemble detects attacker patterns at inception—before a domain even gains reputation history.
+            </p>
+          </div>
+          <div style="background: var(--bg-elevated); padding: 32px; border-radius: var(--radius-lg); border: 1px solid var(--border);">
+            <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 12px; letter-spacing: 0.05em;">
+              Core Safety Guarantee
+            </div>
+            <div style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">
+              Zero Target Connection
+            </div>
+            <p class="text-small" style="line-height: 1.6;">
+              SOLACE never performs HTTP GET requests, follows redirects, renders DOM trees, or runs remote JavaScript. Every computation happens strictly within our local feature extraction pipeline.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 14-Feature ML Pipeline -->
+      <section style="margin-bottom: 64px;">
+        <div class="text-center" style="margin-bottom: 40px;">
+          <div class="section__eyebrow">Explainable AI (XAI)</div>
+          <h2 class="text-h1 section__title">14-Dimensional Heuristic Vector</h2>
+          <p class="section__subtitle section__subtitle--center">
+            Every scanned link is tokenized into 14 mathematical indicators that feed the supervised Random Forest ensemble.
+          </p>
+        </div>
+
+        <div class="grid grid--3">
+          <div class="card fade-in">
+            <h4 class="text-h3" style="color: var(--accent); margin-bottom: 8px;">Shannon Entropy</h4>
+            <p class="text-small">Calculates randomness in host character distribution to catch algorithmically generated domains (DGA).</p>
+          </div>
+
+          <div class="card fade-in">
+            <h4 class="text-h3" style="color: var(--accent); margin-bottom: 8px;">Subdomain Nesting</h4>
+            <p class="text-small">Measures hierarchical depth (e.g., paypal.com.account-update.xyz) used to disguise malicious second-level hosts.</p>
+          </div>
+
+          <div class="card fade-in">
+            <h4 class="text-h3" style="color: var(--accent); margin-bottom: 8px;">Lexical Lure Tokens</h4>
+            <p class="text-small">Detects brand names paired with high-urgency keywords such as login, verify, confirm, kyc, and invoice.</p>
+          </div>
+
+          <div class="card fade-in">
+            <h4 class="text-h3" style="color: var(--accent); margin-bottom: 8px;">Raw IP Addressing</h4>
+            <p class="text-small">Identifies direct IPv4/IPv6 destination addressing that bypasses standard DNS infrastructure.</p>
+          </div>
+
+          <div class="card fade-in">
+            <h4 class="text-h3" style="color: var(--accent); margin-bottom: 8px;">Credential Obfuscation</h4>
+            <p class="text-small">Flags the presence of @ symbols which browsers interpret as basic auth, masking the true host.</p>
+          </div>
+
+          <div class="card fade-in">
+            <h4 class="text-h3" style="color: var(--accent); margin-bottom: 8px;">Abuse TLD Heuristics</h4>
+            <p class="text-small">Evaluates registrars with statistically disproportionate rates of disposable, burner phishing campaigns.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Capstone Software Engineering Tools & Stack -->
+      <section style="margin-bottom: 64px;">
+        <div class="text-center" style="margin-bottom: 40px;">
+          <div class="section__eyebrow">Capstone Engineering Standards</div>
+          <h2 class="text-h1 section__title">Software Engineering Toolchain</h2>
+          <p class="section__subtitle section__subtitle--center">
+            Built in strict alignment with enterprise software lifecycle standards, DevOps automation, and collaborative governance.
+          </p>
+        </div>
+
+        <div class="tool-grid">
+          <!-- 1. GitHub -->
+          <div class="tool-card fade-in">
+            <div class="tool-card__header">
+              <div class="tool-card__logo"><img src="/resources/assets/toolchain/github.jpg" alt="GitHub logo"></div>
+              <span class="badge badge--accent">VCS</span>
+            </div>
+            <div class="tool-card__title">GitHub</div>
+            <div class="tool-card__role">Version Control & Branching</div>
+            <p class="tool-card__desc">Semantic commits, feature branch handoffs, automated pull-request reviews, and collaborative AI pair programming.</p>
+          </div>
+
+          <!-- 2. Vercel -->
+          <div class="tool-card fade-in">
+            <div class="tool-card__header">
+              <div class="tool-card__logo"><img src="/resources/assets/toolchain/vercel.png" alt="Vercel logo"></div>
+              <span class="badge badge--safe">Deploy</span>
+            </div>
+            <div class="tool-card__title">Vercel / Edge</div>
+            <div class="tool-card__role">Cloud Hosting & CDN</div>
+            <p class="tool-card__desc">High-speed global edge deployment of the single-page application with automatic SSL termination and previews.</p>
+          </div>
+
+          <!-- 3. Jira -->
+          <div class="tool-card fade-in">
+            <div class="tool-card__header">
+              <div class="tool-card__logo"><img src="/resources/assets/toolchain/jira.jpg" alt="Jira logo"></div>
+              <span class="badge badge--accent">Agile</span>
+            </div>
+            <div class="tool-card__title">Jira</div>
+            <div class="tool-card__role">Project Tracking & Sprints</div>
+            <p class="tool-card__desc">Agile Kanban/Scrum backlog structuring epics: Zero-Execution Engine, XAI Dashboards, and DevOps Orchestration.</p>
+          </div>
+
+          <!-- 4. Confluence -->
+          <div class="tool-card fade-in">
+            <div class="tool-card__header">
+              <div class="tool-card__logo"><img src="/resources/assets/toolchain/confluence.jpg" alt="Confluence logo"></div>
+              <span class="badge badge--accent">Wiki</span>
+            </div>
+            <div class="tool-card__title">Confluence</div>
+            <div class="tool-card__role">Architecture Documentation</div>
+            <p class="tool-card__desc">Centralized knowledge base maintaining Architecture Decision Records (ADRs), API OpenAPI specs, and test plans.</p>
+          </div>
+
+          <!-- 5. Figma -->
+          <div class="tool-card fade-in">
+            <div class="tool-card__header">
+              <div class="tool-card__logo"><img src="/resources/assets/toolchain/figma.jpg" alt="Figma logo"></div>
+              <span class="badge badge--accent">UI/UX</span>
+            </div>
+            <div class="tool-card__title">Figma</div>
+            <div class="tool-card__role">Design System & Prototypes</div>
+            <p class="tool-card__desc">Ranvel-inspired cinematic dark design system, color token definitions, 3D render composition, and UI wireframes.</p>
+          </div>
+
+          <!-- 6. Docker -->
+          <div class="tool-card fade-in">
+            <div class="tool-card__header">
+              <div class="tool-card__logo"><img src="/resources/assets/toolchain/docker.jpg" alt="Docker logo"></div>
+              <span class="badge badge--safe">Containers</span>
+            </div>
+            <div class="tool-card__title">Docker</div>
+            <div class="tool-card__role">Containerization</div>
+            <p class="tool-card__desc">Multi-stage container images for the FastAPI backend and static frontend with docker-compose service mesh.</p>
+          </div>
+
+          <!-- 7. Kubernetes -->
+          <div class="tool-card fade-in">
+            <div class="tool-card__header">
+              <div class="tool-card__logo"><img src="/resources/assets/toolchain/kubernetes.jpg" alt="Kubernetes logo"></div>
+              <span class="badge badge--safe">Orchestration</span>
+            </div>
+            <div class="tool-card__title">Kubernetes</div>
+            <div class="tool-card__role">Cloud Native Deployment</div>
+            <p class="tool-card__desc">Declarative K8s manifests specifying Deployments, ClusterIP Services, persistent SQLite volumes, and Ingress routing.</p>
+          </div>
+
+          <!-- 8. CI/CD Pipeline -->
+          <div class="tool-card fade-in">
+            <div class="tool-card__header">
+              <div class="tool-card__logo"><img src="/resources/assets/toolchain/cicd.jpg" alt="CI/CD pipeline icon"></div>
+              <span class="badge badge--safe">DevOps</span>
+            </div>
+            <div class="tool-card__title">GitHub Actions</div>
+            <div class="tool-card__role">Continuous Integration</div>
+            <p class="tool-card__desc">Automated CI/CD pipeline verifying code formatting, model artifact validation, Docker builds, and deployment hooks.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Limitations and Responsible AI Notice -->
+      <div class="card card--glass" style="margin-bottom: 48px;">
+        <h3 class="text-h3" style="color: var(--warning); margin-bottom: 12px;">Model Transparency & Advisory</h3>
+        <p class="text-small" style="line-height: 1.7;">
+          SOLACE’s initial model is trained on a reproducible synthetic corpus combined with established lexical heuristic benchmarks. While it achieves high statistical F1-scores on held-out test splits, machine-learning URL scores should be treated as intelligent risk indicators rather than absolute security guarantees. Users should always exercise zero-trust diligence when interacting with untrusted communications.
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img src="/resources/assets/solace-logo.png" alt="SOLACE" class="footer__logo">
+        <span class="footer__name">SOLACE</span>
+      </div>
+
+      <div class="footer__links">
+        <a href="index.html" class="footer__link">Home</a>
+        <a href="scanner.html" class="footer__link">Scanner</a>
+        <a href="dashboard.html" class="footer__link">Dashboard</a>
+        <a href="about.html" class="footer__link">About & Architecture</a>
+      </div>
+
+      <div class="footer__copy">
+        Software Engineering Capstone Project © 2026
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

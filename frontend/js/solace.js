@@ -6,6 +6,15 @@
 (() => {
   'use strict';
 
+  // Opening the HTML files directly gives the page an opaque `null` origin,
+  // which the API correctly rejects. Use the local frontend server instead.
+  if (window.location.protocol === 'file:') {
+    const page = window.location.pathname.split('/').pop() || 'index.html';
+    const destination = new URL(`/${page}${window.location.search}${window.location.hash}`, 'http://127.0.0.1:8000');
+    window.location.replace(destination.href);
+    return;
+  }
+
   // ── Config ───────────────────────────────────────────────────
   const API_BASE = window.SOLACE_API_BASE || 'http://127.0.0.1:8001';
   const API = {
@@ -21,9 +30,11 @@
   // ── API Client ───────────────────────────────────────────────
   async function apiRequest(url, options = {}) {
     try {
+      const headers = { ...options.headers };
+      if (options.body && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
       const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json', ...options.headers },
         ...options,
+        headers,
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ detail: res.statusText }));

@@ -1,0 +1,88 @@
+[
+  {
+    "name": "Scan a phishing lure and retain it in local history",
+    "sanity": true,
+    "viewport": "desktop",
+    "covers": [
+      "URL scan API",
+      "Random Forest verdict",
+      "browser-local scan history",
+      "dashboard history after reload"
+    ],
+    "description": "Verifies a suspicious URL is scored and its scan remains visible in the same browser after navigation and reload.",
+    "steps": [
+      "Open scanner.html and enter http://paypal-verification.security-notice-24.top/signin",
+      "Analyze the URL and confirm a phishing verdict is shown",
+      "Open dashboard.html, refresh the page, and find the scanned URL in the activity table"
+    ],
+    "expected": "The scan result shows a high risk phishing verdict, and the URL remains in this browser’s dashboard history after reload."
+  },
+  {
+    "name": "Reject an unsupported URL scheme",
+    "viewport": "desktop",
+    "covers": [
+      "URL scheme validation",
+      "visible scan error",
+      "invalid input is not added to history"
+    ],
+    "description": "Verifies unsupported protocols produce a visible validation error without adding a scan record.",
+    "steps": [
+      "Open scanner.html and enter ftp://example.com/login",
+      "Submit the URL for analysis",
+      "Open dashboard.html and confirm the rejected URL is not listed"
+    ],
+    "expected": "The scanner shows an unsupported-protocol error and the rejected URL does not appear in scan history."
+  },
+  {
+    "name": "Submit a community report and see it in the shared feed",
+    "viewport": "desktop",
+    "covers": [
+      "community report submission",
+      "shared report database",
+      "dashboard community feed"
+    ],
+    "description": "Verifies an explicitly submitted report is stored and appears in the public community feed.",
+    "steps": [
+      "Open scanner.html and analyze http://paypal-verification.security-notice-24.top/signin",
+      "Enter Analyst review in the report context field and submit the threat report",
+      "Open dashboard.html and refresh the activity table"
+    ],
+    "expected": "A community report row appears with the submitted URL and its selected threat classification."
+  },
+  {
+    "name": "Clear local history without deleting community reports",
+    "viewport": "desktop",
+    "covers": [
+      "local scan history deletion",
+      "destructive-action confirmation",
+      "shared reports remain available"
+    ],
+    "description": "Verifies the confirmed clear action removes browser-local scans while shared reports remain intact.",
+    "setup": [
+      "On scanner.html, analyze https://www.wikipedia.org/ to create a local history row",
+      "Submit a community report for http://paypal-verification.security-notice-24.top/signin"
+    ],
+    "steps": [
+      "Open dashboard.html and confirm both entries are visible",
+      "Choose Clear Local History and confirm the action",
+      "Refresh the dashboard activity table"
+    ],
+    "expected": "The routine Wikipedia scan is gone and the shared community report remains in the feed."
+  },
+  {
+    "name": "Scan a normal URL on mobile",
+    "viewport": "mobile",
+    "covers": [
+      "mobile scanner layout",
+      "valid URL analysis",
+      "safe verdict rendering"
+    ],
+    "description": "Verifies the scanner remains usable on a phone-sized viewport and displays a result for a benign URL.",
+    "steps": [
+      "Open scanner.html at the mobile viewport",
+      "Enter https://www.wikipedia.org/ and analyze it",
+      "Review the verdict and structural breakdown"
+    ],
+    "expected": "The URL is analyzed without layout overflow and the result card displays a lower-risk verdict with its URL breakdown."
+  }
+]
