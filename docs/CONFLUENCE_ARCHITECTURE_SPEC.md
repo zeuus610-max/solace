@@ -1,143 +1,97 @@
-# 📚 SOLACE — Confluence System Architecture Specification
+# SOLACE architecture and implementation notes
 
-> **Document Space:** `SOL-ARCH`  
-> **Document Title:** SOLACE End-to-End System Design & Architecture Specification  
-> **Classification:** Capstone Engineering Blueprint  
+This document describes the code currently in this repository. The repository has a Python implementation and a separate Netlify implementation; they share a user experience and analysis approach, but are not the same deployment artifact.
 
----
+## Overview
 
-## 1. Executive Summary
-
-**SOLACE** is a high-performance URL threat intelligence platform designed to detect zero-hour credential phishing, domain typosquatting, and deceptive link structures. Unlike traditional web security tools that issue HTTP connections (exposing clients to drive-by exploits), SOLACE operates strictly as a **Zero-Execution Lexical Sandbox**.
-
----
-
-## 2. Architecture Decision Records (ADRs)
-
-### ADR-001: Zero-Execution Client Architecture
-* **Status:** Accepted
-* **Context:** Visiting suspect domains to inspect HTML contents triggers attacker honeytokens, executes obfuscated client-side malware, and tips off attackers.
-* **Decision:** Extract exclusively lexical, structural, and mathematical features from the URL string itself. Never issue network requests to the target domain.
-* **Consequences:** Near-instant classification latency (<50ms) and zero risk of malware infection.
-
-### ADR-002: Random Forest Ensemble over Deep Neural Networks
-* **Status:** Accepted
-* **Context:** Deep neural networks (LSTMs, Transformers) introduce high inference latency, large artifact sizes, and opacity (black-box decisions).
-* **Decision:** Deploy a 220-tree scikit-learn `RandomForestClassifier` bounded at `max_depth=14`.
-* **Consequences:** Transparent Gini feature-importance explainability (XAI), predictable memory footprints (~380KB artifact), and CPU execution under 10ms.
-
-### ADR-003: 4-Page Vanilla Frontend with Edge CDN Deployment
-* **Status:** Accepted
-* **Context:** Heavy single-page-application frameworks (React, Next.js) introduce complex build pipelines, dependency rot, and large bundle sizes.
-* **Decision:** Use semantic HTML5, modern CSS3 custom properties, vanilla ES6 modules, and Chart.js via CDN.
-* **Consequences:** Zero-build static deployment to Vercel/Netlify with 100/100 Lighthouse performance and instant time-to-interactive.
-
----
-
-## 3. High-Level System Architecture Diagram
+The scanner accepts a URL string, normalizes and parses it locally, extracts 14 structural features, scores the feature vector with a Random Forest model, and returns a verdict with explanatory signals. It does not request the submitted URL or its hostname.
 
 ```mermaid
-flowchart TD
-    Client["Client Browser (Desktop / Mobile)"]
+flowchart LR
+    Browser[Browser UI]
+    PythonAPI[FastAPI service]
+    PythonModel[scikit-learn Random Forest]
+    SQLite[(SQLite scans)]
+    NetlifyFunction[Netlify Function]
+    BundledModel[Bundled model data]
+    BrowserStore[(Browser localStorage)]
 
-    subgraph CDN["Edge Ingress Layer (Vercel / K8s Ingress)"]
-        UI_Home["/ — index.html"]
-        UI_Scan["/scanner — scanner.html"]
-        UI_Dash["/dashboard — dashboard.html"]
-        UI_About["/about — about.html"]
-    end
-
-    subgraph BackendCluster["SOLACE Backend Pod (FastAPI)"]
-        API_Gateway["FastAPI Router (/api/v1)"]
-        LexicalExtractor["14-Vector Feature Extractor"]
-        ModelInference["Random Forest Ensemble (220 Trees)"]
-        Database["SQLite Telemetry Storage (solace.sqlite3)"]
-    end
-
-    Client --> CDN
-    Client -->|REST Fetch /api/v1/*| API_Gateway
-    API_Gateway --> LexicalExtractor
-    LexicalExtractor --> ModelInference
-    ModelInference --> Database
-    Database --> API_Gateway
+    Browser -->|Python frontend API calls| PythonAPI
+    PythonAPI --> PythonModel
+    PythonModel --> SQLite
+    Browser -->|Netlify same-origin API calls| NetlifyFunction
+    NetlifyFunction --> BundledModel
+    Browser --> BrowserStore
 ```
 
----
+## Implementations
 
-## 4. 14-Dimensional Mathematical Feature Vector
+### Python service and static frontend
 
-| Feature Name | Type | Mathematical / Computational Formulation | Security Justification |
-|---|---|---|---|
-| `url_length` | Integer | Total character count `len(URL)` | Long URLs frequently embed base64 redirects or deep path structures. |
-| `hostname_length` | Integer | Hostname string length | Identifies synthetic generated domains. |
-| `dot_count` | Integer | Count of `.` characters in host | Deep domain segmentation hides authentic registrars. |
-| `hyphen_count` | Integer | Count of `-` characters in URL | Frequently used to mimic genuine brands (e.g., `paypal-verify`). |
-| `at_symbol` | Binary (0/1) | Evaluates `@ in URL` | Basic HTTP auth obfuscation obscures genuine destination host. |
-| `ip_address` | Binary (0/1) | `ipaddress.ip_address(host)` | Direct IP addressing bypasses domain reputational audits. |
-| `https_scheme` | Binary (0/1) | Evaluates `scheme == 'https'` | Baseline protocol posture. |
-| `suspicious_keyword_count`| Integer | Matches against `SUSPICIOUS_WORDS` token set | Quantifies presence of urgency, credentials, or prize lures. |
-| `digit_ratio` | Float | `count(digits) / len(URL)` | High numeric ratio corresponds with disposable host generation. |
-| `subdomain_depth` | Integer | `max(0, len(labels) - 2)` | Identifies sub-nesting abuse on public cloud services. |
-| `path_length` | Integer | Length of path string | Complex nested directories indicate phishing kits. |
-| `query_length` | Integer | Length of query string | Parameter hijacking and tracking tokens. |
-| `entropy` | Float | Shannon entropy $-\sum p(x) \log_2 p(x)$ | Statistical measure of character unpredictability in hostname. |
-| `shortener_host` | Binary (0/1) | Lookup in `SHORTENERS` set | Bitly, TinyURL, and shorteners conceal destination risk. |
+- `frontend/` contains four static pages and a JavaScript API client.
+- `backend/main.py` provides the FastAPI routes, URL normalization, feature extraction, model inference, SQLite persistence, analytics, and CSV retraining endpoint.
+- The UI defaults to the API at `http://127.0.0.1:8001`; deployments need an appropriate configured API base and CORS policy.
+- SQLite stores scan URLs, verdicts, risk scores, model signals, features, and timestamps. `PHISHGUARD_DB_PATH` can override its file path.
 
----
+### Netlify implementation
 
-## 5. REST API Specifications
+- `appdeploy-solace/` contains the Netlify build, static pages, model data, and serverless API function.
+- The Netlify Function executes the bundled model in the function runtime and serves same-origin API routes.
+- Scan history is stored by the browser in `localStorage`; the serverless function's `GET /api/v1/scans` returns an empty list. This version does not share history between browsers.
+- This implementation has no Python backend, SQLite store, or model retraining endpoint.
 
-### `POST /api/v1/scans`
-- **Request:** `{ "url": "string" }`
-- **Response (200 OK):**
-  ```json
-  {
-    "id": 142,
-    "rawUrl": "http://paypal-verification.security-notice-24.top/signin",
-    "protocol": "http",
-    "subdomain": "paypal-verification",
-    "rootDomain": "security-notice-24.top",
-    "tld": "top",
-    "pathAndQuery": "/signin",
-    "finalRiskScore": 94,
-    "verdict": "PHISHING",
-    "confidence": "96.4% model confidence",
-    "latencyMs": 14,
-    "triggers": [
-      "The trained Random Forest classifier assigned a high phishing probability.",
-      "Contains 2 credential, urgency, or reward-related keyword(s).",
-      "The .top top-level domain is frequently abused in suspicious URLs."
-    ],
-    "featuresList": [ ... ]
-  }
-  ```
+See [API reference](API.md) and [deployment guide](DEPLOYMENT.md) for the route and hosting details.
 
-### `GET /api/v1/analytics/summary`
-- **Response (200 OK):**
-  ```json
-  {
-    "total_scans": 182,
-    "phishing": 44,
-    "suspicious": 28,
-    "safe": 110
-  }
-  ```
+## URL parsing and feature extraction
 
-### `GET /api/v1/model`
-- **Response (200 OK):**
-  ```json
-  {
-    "name": "Random Forest (scikit-learn)",
-    "training_rows": 6000,
-    "metrics": {
-      "accuracy": 0.981,
-      "precision": 0.983,
-      "recall": 0.979,
-      "f1": 0.981
-    },
-    "feature_importance": [
-      { "name": "Entropy", "importance": 0.245 },
-      { "name": "Suspicious Keyword Count", "importance": 0.198 }
-    ]
-  }
-  ```
+Both implementations trim the input, reject empty or overlong values, reject whitespace/control characters, add `https://` when a scheme is missing, and accept only HTTP or HTTPS URLs. They then derive structural features without connecting to the URL.
+
+The 14 feature names are `url_length`, `hostname_length`, `dot_count`, `hyphen_count`, `at_symbol`, `ip_address`, `https_scheme`, `suspicious_keyword_count`, `digit_ratio`, `subdomain_depth`, `path_length`, `query_length`, `entropy`, and `shortener_host`.
+
+The implementation uses simple hostname label splitting for subdomain and root-domain display. It does not use a public suffix database. Detailed definitions and interpretation cautions are in [Scoring and limitations](SCORING_AND_LIMITATIONS.md).
+
+## Scoring
+
+The Python API scores the positive (phishing) class probability of a 220-tree scikit-learn Random Forest. On first run without a saved model artifact, it creates a reproducible synthetic starter dataset and trains a model. Verdict thresholds are `SAFE` for scores below 45, `SUSPICIOUS` for 45–74, and `PHISHING` for 75 or higher.
+
+The Netlify implementation has an included model artifact encoded as TypeScript data and runs equivalent model inference in the function. Neither implementation provides real-time external reputation checks. Synthetic-data metrics are not measures of real-world detection performance.
+
+## Design decisions
+
+### ADR-001: Analyze the URL without visiting its destination
+
+**Decision:** Extract URL structure and compute a model score without issuing requests to the submitted host.
+
+**Reason:** The scanner should not execute a suspicious page or disclose the analyst's IP address by visiting it.
+
+**Trade-off:** Without page contents, redirect chains, DNS, registration data, or live reputation feeds, results are limited to the visible URL string and model patterns.
+
+### ADR-002: Keep results explainable
+
+**Decision:** Return the input feature values, model probability, and human-readable structural signals.
+
+**Reason:** Analysts should be able to see which URL patterns contributed context around a verdict.
+
+**Trade-off:** Model probabilities and feature importance are not calibrated evidence of safety. They can be wrong, especially on data unlike the synthetic training examples.
+
+### ADR-003: Keep the UI static and the API deployable separately
+
+**Decision:** Use static HTML/CSS/JavaScript for the four-page UI; provide both a Python API and a Netlify Function implementation.
+
+**Reason:** Static pages are simple to host, while the two backend options support local learning and a serverless demo.
+
+**Trade-off:** The two API implementations have different persistence and endpoint capabilities. Documentation and deployment configuration must identify which implementation is in use.
+
+## Storage and operational considerations
+
+- The Python implementation stores scan data in SQLite and includes unauthenticated delete and retrain routes. Do not expose it publicly without access controls.
+- Submitted URLs can contain credentials or tokens in their query strings. Treat scan history as sensitive and avoid real secrets in demos.
+- The Netlify implementation stores recent scan results in the browser, not in a shared server database.
+- The included Kubernetes and Vercel files are deployment starting points and need review for API routing, CORS, TLS, persistence, and access control.
+
+## Related references
+
+- [API reference](API.md)
+- [Deployment guide](DEPLOYMENT.md)
+- [Scoring and limitations](SCORING_AND_LIMITATIONS.md)
+- [Jira backlog](JIRA_SPRINT_BACKLOG.md)
