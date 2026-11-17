@@ -339,6 +339,114 @@
     }
   }
 
+  // ── Interactive software engineering toolchain ─────────────
+  function initToolchain() {
+    const explorer = document.querySelector('[data-toolchain]');
+    if (!explorer) return;
+
+    const tools = {
+      github: {
+        category: 'Source & collaboration', title: 'GitHub', status: 'PROJECT SOURCE', color: '#a78bfa', glow: 'rgba(167,139,250,.17)',
+        summary: 'The public repository holds the two app implementations, service code, deployment files, and project documentation.',
+        evidence: 'Python frontend and FastAPI backend sit alongside the separate Netlify app, its function, and bundled model. The README explains how the two versions differ.',
+        artifact: 'frontend/ · backend/ · appdeploy-solace/ · docs/',
+        href: 'https://github.com/zeuus610-max/solace', link: 'Open GitHub work',
+      },
+      netlify: {
+        category: 'Build & hosting', title: 'Netlify', status: 'LIVE · ACTIVE', color: '#35d4c3', glow: 'rgba(53,212,195,.17)',
+        summary: 'The public SOLACE site is built from appdeploy-solace and served from Netlify.',
+        evidence: 'The Netlify build copies the four app pages, styles, assets, and JavaScript into dist. A same-origin Netlify Function handles scan requests; recent scan history stays in each visitor’s browser.',
+        artifact: 'appdeploy-solace/netlify.toml · build.mjs · netlify/functions/api.ts',
+        href: null, link: '',
+      },
+      jira: {
+        category: 'Planning & tracking', title: 'Jira', status: 'TEAM BACKLOG', color: '#579dff', glow: 'rgba(87,157,255,.17)',
+        summary: 'The team backlog gives project work a place to be tracked and reviewed.',
+        evidence: 'The supplied Jira reference opens issue SCRUM-22 in the team backlog. This page links to that record as planning evidence; it does not read Jira status live.',
+        artifact: 'SCRUM-22 · team backlog',
+        href: 'https://zeuus610.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog?selectedIssue=SCRUM-22&atlOrigin=eyJpIjoiM2JjZjY2YzE2NWUwNDJlNjkzNDE5Zjc5Zjg1ODdkNDAiLCJwIjoiaiJ9', link: 'Open Jira work',
+      },
+      confluence: {
+        category: 'Knowledge & architecture', title: 'Confluence', status: 'TEAM WALKTHROUGH', color: '#62a8ff', glow: 'rgba(98,168,255,.17)',
+        summary: 'The backend walkthrough documents how the Python service is organized and how a URL scan moves through it.',
+        evidence: 'The repository also keeps architecture, API, deployment, and scoring notes, which make the implementation easier to trace alongside the team walkthrough.',
+        artifact: 'SOLACE Backend Python Code Walkthrough',
+        href: 'https://zeuus610.atlassian.net/wiki/spaces/SD/pages/131074/SOLACE+Backend+Python+Code+Walkthrough', link: 'Open Confluence work',
+      },
+      figma: {
+        category: 'Product design', title: 'Figma', status: 'DESIGN FILE', color: '#f078b4', glow: 'rgba(240,120,180,.17)',
+        summary: 'The PhishGuard design file is the visual reference for the SOLACE interface and its component language.',
+        evidence: 'The checked-in design specification defines the dark surfaces, orange accent, typography, verdict gauge, URL chips, and chart treatments used across the application.',
+        artifact: 'docs/FIGMA_DESIGN_SYSTEM.md · dark theme · orange accent',
+        href: 'https://www.figma.com/design/htcTe24SyDBTiC0z6hhfXF/PhishGuard?node-id=0-1&p=f&t=4wZqe38dkw2RA3lk-0', link: 'Open Figma work',
+      },
+      docker: {
+        category: 'Local development', title: 'Docker', status: 'COMPOSE CONFIGURED', color: '#54b6ff', glow: 'rgba(84,182,255,.17)',
+        summary: 'Docker Compose runs the updated SOLACE site and its Python scanning API as separate local containers.',
+        evidence: 'The Nginx site serves the built pages and assets, then forwards /api requests to the API container. Compose waits for API health and keeps SQLite data in a named volume.',
+        artifact: 'appdeploy-solace/compose.yaml · Dockerfile · nginx.conf · Dockerfile.backend',
+        href: 'https://github.com/zeuus610-max/solace/blob/master/appdeploy-solace/compose.yaml', link: 'Open Docker work',
+      },
+      kubernetes: {
+        category: 'Container orchestration', title: 'Kubernetes', status: 'LOCAL CLUSTER READY', color: '#8c82ff', glow: 'rgba(140,130,255,.18)',
+        summary: 'The SOLACE site and scanning API run as separate workloads in the local Docker Desktop Kubernetes cluster.',
+        evidence: 'The solace-local namespace has site and API Deployments, health probes, ClusterIP and NodePort Services, and a persistent volume claim for SQLite scan history.',
+        artifact: 'appdeploy-solace/k8s/local.yaml · namespace solace-local · 1 GiB data volume',
+        href: 'https://github.com/zeuus610-max/solace/blob/master/appdeploy-solace/k8s/local.yaml', link: 'Open Kubernetes work',
+      },
+      actions: {
+        category: 'Continuous integration', title: 'GitHub Actions', status: 'CI WORKFLOW', color: '#79dda4', glow: 'rgba(121,221,164,.16)',
+        summary: 'A workflow checks the Python implementation and validates the container and Kubernetes setup on pushes and pull requests.',
+        evidence: 'The workflow compiles the API, runs a model and 14-feature smoke check, builds both Docker images, and dry-run validates the Kubernetes manifests. It does not publish a deployment.',
+        artifact: '.github/workflows/ci.yml',
+        href: 'https://github.com/zeuus610-max/solace/blob/master/.github/workflows/ci.yml', link: 'Open Actions work',
+      },
+    };
+
+    const fields = {
+      category: explorer.querySelector('[data-tool-category]'),
+      step: explorer.querySelector('[data-tool-step]'),
+      title: explorer.querySelector('[data-tool-title]'),
+      summary: explorer.querySelector('[data-tool-summary]'),
+      status: explorer.querySelector('[data-tool-status]'),
+      evidence: explorer.querySelector('[data-tool-evidence]'),
+      artifact: explorer.querySelector('[data-tool-artifact]'),
+      link: explorer.querySelector('[data-tool-link]'),
+      linkLabel: explorer.querySelector('[data-tool-link-label]'),
+    };
+    const nodes = [...explorer.querySelectorAll('.se-node[data-tool]')];
+
+    nodes.forEach((node, index) => {
+      node.addEventListener('click', () => {
+        const item = tools[node.dataset.tool];
+        if (!item) return;
+        nodes.forEach((entry) => {
+          const active = entry === node;
+          entry.classList.toggle('is-active', active);
+          entry.setAttribute('aria-pressed', String(active));
+        });
+        fields.category.textContent = item.category;
+        fields.step.textContent = `${String(index + 1).padStart(2, '0')} / 08`;
+        fields.title.textContent = item.title;
+        fields.summary.textContent = item.summary;
+        fields.status.textContent = item.status;
+        fields.evidence.textContent = item.evidence;
+        fields.artifact.textContent = item.artifact;
+        fields.linkLabel.textContent = item.link;
+        if (item.href) {
+          fields.link.href = item.href;
+          fields.link.hidden = false;
+        } else {
+          fields.link.removeAttribute('href');
+          fields.link.hidden = true;
+        }
+        explorer.dataset.activeTool = node.dataset.tool;
+        explorer.style.setProperty('--tool-color', item.color);
+        explorer.style.setProperty('--tool-glow', item.glow);
+      });
+    });
+  }
+
   // ── Animated Counter ─────────────────────────────────────────
   function animateCounters() {
     document.querySelectorAll('[data-count]').forEach(el => {
@@ -441,6 +549,7 @@
   // ── Init ─────────────────────────────────────────────────────
   function init() {
     initNav();
+    initToolchain();
     animateCounters();
     initScrollAnimations();
   }

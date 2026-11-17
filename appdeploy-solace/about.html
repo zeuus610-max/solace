@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About & Architecture — SOLACE</title>
-  <link rel="icon" type="image/png" href="/resources/assets/solace-logo.png">
+  <link rel="icon" type="image/png" href="resources/assets/solace-logo.png">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
   <header class="nav" id="topNav">
     <div class="nav__inner">
       <a href="index.html" class="nav__brand" aria-label="SOLACE Home">
-        <img src="/resources/assets/solace-logo.png" alt="SOLACE Logo" class="nav__logo">
+        <img src="resources/assets/solace-logo.png" alt="SOLACE Logo" class="nav__logo">
         <span class="nav__wordmark">SOLACE</span>
       </a>
 
@@ -122,104 +122,80 @@
       </section>
 
       <!-- Capstone Software Engineering Tools & Stack -->
-      <section style="margin-bottom: 64px;">
-        <div class="text-center" style="margin-bottom: 40px;">
-          <div class="section__eyebrow">Capstone Engineering Standards</div>
-          <h2 class="text-h1 section__title">Software Engineering Toolchain</h2>
+      <section class="se-toolchain" id="toolchain" aria-labelledby="toolchain-title">
+        <div class="text-center se-toolchain__heading">
+          <div class="section__eyebrow">How the project is built</div>
+          <h2 class="text-h1 section__title" id="toolchain-title">Eight tools. One working system.</h2>
           <p class="section__subtitle section__subtitle--center">
-            Built in strict alignment with enterprise software lifecycle standards, DevOps automation, and collaborative governance.
+            Select a node to see where each tool fits, what is present in this project, and the evidence behind it.
           </p>
         </div>
 
-        <div class="tool-grid">
-          <!-- 1. GitHub -->
-          <div class="tool-card fade-in">
-            <div class="tool-card__header">
-              <div class="tool-card__logo"><img src="/resources/assets/toolchain/github.jpg" alt="GitHub logo"></div>
-              <span class="badge badge--accent">VCS</span>
+        <div class="se-explorer" data-toolchain data-active-tool="github">
+          <div class="se-constellation" role="group" aria-label="Interactive map of the SOLACE software engineering tools">
+            <div class="se-core" aria-hidden="true">
+              <video class="se-core__orbit" autoplay muted loop playsinline preload="auto" tabindex="-1">
+                <source src="resources/assets/solace-orbit.mp4" type="video/mp4">
+              </video>
+              <span>SOLACE</span>
+              <small>URL risk analysis</small>
             </div>
-            <div class="tool-card__title">GitHub</div>
-            <div class="tool-card__role">Version Control & Branching</div>
-            <p class="tool-card__desc">Semantic commits, feature branch handoffs, automated pull-request reviews, and collaborative AI pair programming.</p>
+            <button class="se-node is-active" type="button" data-tool="github" aria-label="GitHub: show project source details" aria-pressed="true" style="--node-x: 5%; --node-y: 24%; --angle: -157.5deg; --node-z: 48px">
+              <span class="se-node__logo"><img src="resources/assets/toolchain/github.jpg" alt=""></span><span class="se-node__label">GitHub</span><span class="se-node__index">01</span>
+            </button>
+            <button class="se-node" type="button" data-tool="netlify" aria-label="Netlify: show live deployment status" aria-pressed="false" style="--node-x: 24%; --node-y: 4%; --angle: -112.5deg; --node-z: 20px">
+              <span class="se-node__logo se-node__logo--netlify"><img src="resources/assets/toolchain/netlify.png" alt=""></span><span class="se-node__label">Netlify</span><span class="se-node__index">02</span>
+            </button>
+            <button class="se-node" type="button" data-tool="jira" aria-label="Jira: show planning details" aria-pressed="false" style="--node-x: 55%; --node-y: 4%; --angle: -67.5deg; --node-z: 34px">
+              <span class="se-node__logo"><img src="resources/assets/toolchain/jira.jpg" alt=""></span><span class="se-node__label">Jira</span><span class="se-node__index">03</span>
+            </button>
+            <button class="se-node" type="button" data-tool="confluence" aria-label="Confluence: show documentation details" aria-pressed="false" style="--node-x: 72%; --node-y: 24%; --angle: -22.5deg; --node-z: 10px">
+              <span class="se-node__logo"><img src="resources/assets/toolchain/confluence.jpg" alt=""></span><span class="se-node__label">Confluence</span><span class="se-node__index">04</span>
+            </button>
+            <button class="se-node" type="button" data-tool="figma" aria-label="Figma: show design file details" aria-pressed="false" style="--node-x: 72%; --node-y: 64%; --angle: 22.5deg; --node-z: 46px">
+              <span class="se-node__logo"><img src="resources/assets/toolchain/figma.jpg" alt=""></span><span class="se-node__label">Figma</span><span class="se-node__index">05</span>
+            </button>
+            <button class="se-node" type="button" data-tool="docker" aria-label="Docker: show local container setup" aria-pressed="false" style="--node-x: 55%; --node-y: 82%; --angle: 67.5deg; --node-z: 18px">
+              <span class="se-node__logo"><img src="resources/assets/toolchain/docker.jpg" alt=""></span><span class="se-node__label">Docker</span><span class="se-node__index">06</span>
+            </button>
+            <button class="se-node" type="button" data-tool="kubernetes" aria-label="Kubernetes: show deployment manifest details" aria-pressed="false" style="--node-x: 24%; --node-y: 82%; --angle: 112.5deg; --node-z: 40px">
+              <span class="se-node__logo"><img src="resources/assets/toolchain/kubernetes.jpg" alt=""></span><span class="se-node__label">Kubernetes</span><span class="se-node__index">07</span>
+            </button>
+            <button class="se-node" type="button" data-tool="actions" aria-label="GitHub Actions: show CI workflow details" aria-pressed="false" style="--node-x: 5%; --node-y: 64%; --angle: 157.5deg; --node-z: 24px">
+              <span class="se-node__logo"><img src="resources/assets/toolchain/cicd.jpg" alt=""></span><span class="se-node__label">GitHub Actions</span><span class="se-node__index">08</span>
+            </button>
+            <p class="se-constellation__hint"><span aria-hidden="true">↗</span> Pick a tool to inspect its role</p>
           </div>
 
-          <!-- 2. Vercel -->
-          <div class="tool-card fade-in">
-            <div class="tool-card__header">
-              <div class="tool-card__logo"><img src="/resources/assets/toolchain/vercel.png" alt="Vercel logo"></div>
-              <span class="badge badge--safe">Deploy</span>
+          <article class="se-detail" aria-live="polite" aria-atomic="true">
+            <div class="se-detail__topline"><span class="se-detail__eyebrow" data-tool-category>Source & collaboration</span><span class="se-detail__step" data-tool-step>01 / 08</span></div>
+            <h3 class="se-detail__title" data-tool-title>GitHub</h3>
+            <p class="se-detail__summary" data-tool-summary>The public repository holds the two app implementations, the service code, deployment files, and the project documentation.</p>
+            <div class="se-detail__status"><span class="se-status-dot" aria-hidden="true"></span><span data-tool-status>Project source</span></div>
+            <div class="se-detail__evidence">
+              <span class="se-detail__label">What is implemented</span>
+              <p data-tool-evidence>Python frontend and FastAPI backend, plus a separate Netlify app with its own function and bundled model. The project README explains how the two versions differ.</p>
             </div>
-            <div class="tool-card__title">Vercel / Edge</div>
-            <div class="tool-card__role">Cloud Hosting & CDN</div>
-            <p class="tool-card__desc">High-speed global edge deployment of the single-page application with automatic SSL termination and previews.</p>
-          </div>
-
-          <!-- 3. Jira -->
-          <div class="tool-card fade-in">
-            <div class="tool-card__header">
-              <div class="tool-card__logo"><img src="/resources/assets/toolchain/jira.jpg" alt="Jira logo"></div>
-              <span class="badge badge--accent">Agile</span>
+            <div class="se-detail__artifact">
+              <span class="se-detail__label">Project artifact</span>
+              <code data-tool-artifact>frontend/ · backend/ · appdeploy-solace/ · docs/</code>
             </div>
-            <div class="tool-card__title">Jira</div>
-            <div class="tool-card__role">Project Tracking & Sprints</div>
-            <p class="tool-card__desc">Agile Kanban/Scrum backlog structuring epics: Zero-Execution Engine, XAI Dashboards, and DevOps Orchestration.</p>
-          </div>
-
-          <!-- 4. Confluence -->
-          <div class="tool-card fade-in">
-            <div class="tool-card__header">
-              <div class="tool-card__logo"><img src="/resources/assets/toolchain/confluence.jpg" alt="Confluence logo"></div>
-              <span class="badge badge--accent">Wiki</span>
-            </div>
-            <div class="tool-card__title">Confluence</div>
-            <div class="tool-card__role">Architecture Documentation</div>
-            <p class="tool-card__desc">Centralized knowledge base maintaining Architecture Decision Records (ADRs), API OpenAPI specs, and test plans.</p>
-          </div>
-
-          <!-- 5. Figma -->
-          <div class="tool-card fade-in">
-            <div class="tool-card__header">
-              <div class="tool-card__logo"><img src="/resources/assets/toolchain/figma.jpg" alt="Figma logo"></div>
-              <span class="badge badge--accent">UI/UX</span>
-            </div>
-            <div class="tool-card__title">Figma</div>
-            <div class="tool-card__role">Design System & Prototypes</div>
-            <p class="tool-card__desc">Ranvel-inspired cinematic dark design system, color token definitions, 3D render composition, and UI wireframes.</p>
-          </div>
-
-          <!-- 6. Docker -->
-          <div class="tool-card fade-in">
-            <div class="tool-card__header">
-              <div class="tool-card__logo"><img src="/resources/assets/toolchain/docker.jpg" alt="Docker logo"></div>
-              <span class="badge badge--safe">Containers</span>
-            </div>
-            <div class="tool-card__title">Docker</div>
-            <div class="tool-card__role">Containerization</div>
-            <p class="tool-card__desc">Multi-stage container images for the FastAPI backend and static frontend with docker-compose service mesh.</p>
-          </div>
-
-          <!-- 7. Kubernetes -->
-          <div class="tool-card fade-in">
-            <div class="tool-card__header">
-              <div class="tool-card__logo"><img src="/resources/assets/toolchain/kubernetes.jpg" alt="Kubernetes logo"></div>
-              <span class="badge badge--safe">Orchestration</span>
-            </div>
-            <div class="tool-card__title">Kubernetes</div>
-            <div class="tool-card__role">Cloud Native Deployment</div>
-            <p class="tool-card__desc">Declarative K8s manifests specifying Deployments, ClusterIP Services, persistent SQLite volumes, and Ingress routing.</p>
-          </div>
-
-          <!-- 8. CI/CD Pipeline -->
-          <div class="tool-card fade-in">
-            <div class="tool-card__header">
-              <div class="tool-card__logo"><img src="/resources/assets/toolchain/cicd.jpg" alt="CI/CD pipeline icon"></div>
-              <span class="badge badge--safe">DevOps</span>
-            </div>
-            <div class="tool-card__title">GitHub Actions</div>
-            <div class="tool-card__role">Continuous Integration</div>
-            <p class="tool-card__desc">Automated CI/CD pipeline verifying code formatting, model artifact validation, Docker builds, and deployment hooks.</p>
-          </div>
+            <a class="se-detail__link" data-tool-link href="https://github.com/zeuus610-max/solace" target="_blank" rel="noreferrer">
+              <span data-tool-link-label>Open GitHub work</span><span aria-hidden="true">↗</span>
+            </a>
+          </article>
         </div>
+
+        <div class="se-flow" role="group" aria-label="Project workflow">
+          <div class="se-flow__item"><span>01</span><strong>Plan & design</strong><small>Jira · Confluence · Figma</small></div>
+          <span class="se-flow__connector" aria-hidden="true"></span>
+          <div class="se-flow__item"><span>02</span><strong>Build & version</strong><small>GitHub · HTML · TypeScript · Python</small></div>
+          <span class="se-flow__connector" aria-hidden="true"></span>
+          <div class="se-flow__item"><span>03</span><strong>Check & package</strong><small>Actions · Docker</small></div>
+          <span class="se-flow__connector" aria-hidden="true"></span>
+          <div class="se-flow__item"><span>04</span><strong>Serve & explore</strong><small>Netlify live · Kubernetes examples</small></div>
+        </div>
+        <p class="se-toolchain__note"><strong>Deployment note:</strong> the public app is hosted on Netlify. Docker Compose runs the Python version locally; Kubernetes manifests are examples, not the live deployment.</p>
       </section>
 
       <!-- Limitations and Responsible AI Notice -->
@@ -237,7 +213,7 @@
   <footer class="footer">
     <div class="container footer__inner">
       <div class="footer__brand">
-        <img src="/resources/assets/solace-logo.png" alt="SOLACE" class="footer__logo">
+        <img src="resources/assets/solace-logo.png" alt="SOLACE" class="footer__logo">
         <span class="footer__name">SOLACE</span>
       </div>
 
@@ -254,6 +230,6 @@
     </div>
   </footer>
 
-  <script type="module" src="/src/main.js"></script>
+  <script type="module" src="src/solace.js"></script>
 </body>
 </html>
